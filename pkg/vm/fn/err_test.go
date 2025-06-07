@@ -1,0 +1,234 @@
+package fn_test
+
+import (
+	"errors"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+	"github.com/xakepp35/aql/pkg/vm"
+	"github.com/xakepp35/aql/pkg/vm/fn"
+	"github.com/xakepp35/aql/pkg/vmi"
+)
+
+func TestFnAdd_Errors(t *testing.T) {
+	t.Run("int + string", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(10, "hello")
+		fn.Add(s)
+		require.Error(t, s.Err())
+	})
+	t.Run("bool + string", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(true, "abc")
+		fn.Add(s)
+		require.Error(t, s.Err())
+	})
+	t.Run("unknown + unknown", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(errors.New("err"), struct{}{})
+		fn.Add(s)
+		require.Error(t, s.Err())
+	})
+}
+
+func TestFnSub_Errors(t *testing.T) {
+	t.Run("float64 - string", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(1.1, "x")
+		fn.Sub(s)
+		require.Error(t, s.Err())
+	})
+	t.Run("string - int64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs("x", int64(1))
+		fn.Sub(s)
+		require.Error(t, s.Err())
+	})
+}
+
+func TestFnDiv_Errors(t *testing.T) {
+	t.Run("division by zero int64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(int64(10), int64(0))
+		fn.Div(s)
+		require.ErrorContains(t, s.Err(), "division by zero")
+	})
+	t.Run("division by zero float64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(1.0, 0.0)
+		fn.Div(s)
+		require.ErrorContains(t, s.Err(), "division by zero")
+	})
+	t.Run("wrong types", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs("abc", 3)
+		fn.Div(s)
+		require.Error(t, s.Err())
+	})
+	t.Run("valid int64 division", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(int64(6), int64(2))
+		fn.Div(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, int64(3), s.Pop())
+	})
+	t.Run("valid float64 division", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(6.0, 2.0)
+		fn.Div(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, 3.0, s.Pop())
+	})
+}
+
+func TestFnMod_Errors(t *testing.T) {
+	t.Run("mod by zero", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(int64(10), int64(0))
+		fn.Mod(s)
+		require.ErrorContains(t, s.Err(), "non zero")
+	})
+	t.Run("non-int64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs("a", 5)
+		fn.Mod(s)
+		require.Error(t, s.Err())
+	})
+}
+
+func TestFnLt_Errors(t *testing.T) {
+	t.Run("unsupported types", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs([]int{1}, 2)
+		fn.Lt(s)
+		require.Error(t, s.Err())
+	})
+	t.Run("int64 < int64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(int64(1), int64(2))
+		fn.Lt(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, true, s.Pop())
+	})
+}
+
+func TestFnLe(t *testing.T) {
+	t.Run("int64 <= int64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(int64(2), int64(2))
+		fn.Le(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, true, s.Pop())
+	})
+	t.Run("float64 <= float64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(2.0, 3.0)
+		fn.Le(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, true, s.Pop())
+	})
+	t.Run("string <= string", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs("a", "b")
+		fn.Le(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, true, s.Pop())
+	})
+}
+
+func TestFnGt(t *testing.T) {
+	t.Run("int64 > int64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(int64(3), int64(2))
+		fn.Gt(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, true, s.Pop())
+	})
+	t.Run("string > string", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(string("3"), string("2"))
+		fn.Gt(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, true, s.Pop())
+	})
+}
+
+func TestFnGe(t *testing.T) {
+	t.Run("int64 >= int64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(int64(2), int64(2))
+		fn.Ge(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, true, s.Pop())
+	})
+	t.Run("float64 >= float64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(2.0, 1.5)
+		fn.Ge(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, true, s.Pop())
+	})
+	t.Run("string >= string", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs("b", "a")
+		fn.Ge(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, true, s.Pop())
+	})
+}
+
+func TestFnMul(t *testing.T) {
+	t.Run("int64 * int64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(int64(3), int64(2))
+		fn.Mul(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, int64(6), s.Pop())
+	})
+}
+
+func TestFnNeq(t *testing.T) {
+	t.Run("int64 != int64", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(int64(1), int64(2))
+		fn.Neq(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, true, s.Pop())
+	})
+}
+
+func TestFnNop(t *testing.T) {
+	s := vm.NewState()
+	fn.Nop(s)
+	require.NoError(t, s.Err())
+}
+
+func TestFnPushNil(t *testing.T) {
+	s := vm.NewState()
+	fn.PushNil(s)
+	require.NoError(t, s.Err())
+	require.Nil(t, s.Pop())
+}
+
+func TestFnHalt(t *testing.T) {
+	s := vm.NewState()
+	fn.Halt(s)
+	require.ErrorIs(t, s.Err(), vmi.ErrHalted)
+}
+
+func TestFnNot_Errors(t *testing.T) {
+	t.Run("not a bool", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs("hello")
+		fn.Not(s)
+		require.ErrorContains(t, s.Err(), "expected bool")
+	})
+
+	t.Run("negation of bool", func(t *testing.T) {
+		s := vm.NewState()
+		s.PushArgs(true)
+		fn.Not(s)
+		require.NoError(t, s.Err())
+		require.Equal(t, false, s.Pop())
+	})
+}

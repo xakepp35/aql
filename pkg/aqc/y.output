@@ -1,0 +1,905 @@
+
+state 0
+	$accept: .query $end 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	query  goto 1
+	expr  goto 2
+	pipe  goto 3
+	or  goto 4
+	and  goto 5
+	cmp  goto 6
+	add  goto 7
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 1
+	$accept:  query.$end 
+
+	$end  accept
+	.  error
+
+
+state 2
+	query:  expr.    (1)
+
+	.  reduce 1 (src line 37)
+
+
+state 3
+	expr:  pipe.    (2)
+	pipe:  pipe.PIPE or 
+
+	PIPE  shift 21
+	.  reduce 2 (src line 42)
+
+
+state 4
+	pipe:  or.    (3)
+	or:  or.OROR and 
+
+	OROR  shift 22
+	.  reduce 3 (src line 46)
+
+
+state 5
+	or:  and.    (5)
+	and:  and.ANDAND cmp 
+
+	ANDAND  shift 23
+	.  reduce 5 (src line 51)
+
+
+state 6
+	and:  cmp.    (7)
+	cmp:  cmp.EQ add 
+	cmp:  cmp.NEQ add 
+	cmp:  cmp.LT add 
+	cmp:  cmp.LE add 
+	cmp:  cmp.GT add 
+	cmp:  cmp.GE add 
+
+	EQ  shift 24
+	NEQ  shift 25
+	LT  shift 26
+	LE  shift 27
+	GT  shift 28
+	GE  shift 29
+	.  reduce 7 (src line 56)
+
+
+state 7
+	cmp:  add.    (9)
+	add:  add.PLUS mul 
+	add:  add.MINUS mul 
+
+	PLUS  shift 30
+	MINUS  shift 31
+	.  reduce 9 (src line 61)
+
+
+state 8
+	add:  mul.    (16)
+	mul:  mul.STAR unary 
+	mul:  mul.SLASH unary 
+	mul:  mul.PERCENT unary 
+
+	STAR  shift 32
+	SLASH  shift 33
+	PERCENT  shift 34
+	.  reduce 16 (src line 71)
+
+
+state 9
+	mul:  unary.    (19)
+
+	.  reduce 19 (src line 77)
+
+
+state 10
+	unary:  post.    (23)
+	post:  post.DOT IDENT 
+	post:  post.LBRACK expr RBRACK 
+	post:  post.LBRACK expr COLON expr RBRACK 
+
+	DOT  shift 35
+	LBRACK  shift 36
+	.  reduce 23 (src line 85)
+
+
+state 11
+	unary:  MINUS.unary 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	unary  goto 37
+	post  goto 10
+	atom  goto 13
+
+state 12
+	unary:  OVER.unary 
+	unary:  OVER.unary ARROW LPAREN expr RPAREN 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	unary  goto 38
+	post  goto 10
+	atom  goto 13
+
+state 13
+	post:  atom.    (27)
+
+	.  reduce 27 (src line 93)
+
+
+state 14
+	post:  IDENT.LPAREN RPAREN 
+	post:  IDENT.LPAREN arg_list RPAREN 
+	atom:  IDENT.    (35)
+
+	LPAREN  shift 39
+	.  reduce 35 (src line 122)
+
+
+state 15
+	atom:  NUMBER.    (36)
+
+	.  reduce 36 (src line 124)
+
+
+state 16
+	atom:  STRING.    (37)
+
+	.  reduce 37 (src line 125)
+
+
+state 17
+	atom:  TRUE.    (38)
+
+	.  reduce 38 (src line 126)
+
+
+state 18
+	atom:  FALSE.    (39)
+
+	.  reduce 39 (src line 127)
+
+
+state 19
+	atom:  NULL.    (40)
+
+	.  reduce 40 (src line 128)
+
+
+state 20
+	atom:  LPAREN.expr RPAREN 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	expr  goto 40
+	pipe  goto 3
+	or  goto 4
+	and  goto 5
+	cmp  goto 6
+	add  goto 7
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 21
+	pipe:  pipe PIPE.or 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	or  goto 41
+	and  goto 5
+	cmp  goto 6
+	add  goto 7
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 22
+	or:  or OROR.and 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	and  goto 42
+	cmp  goto 6
+	add  goto 7
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 23
+	and:  and ANDAND.cmp 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	cmp  goto 43
+	add  goto 7
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 24
+	cmp:  cmp EQ.add 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	add  goto 44
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 25
+	cmp:  cmp NEQ.add 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	add  goto 45
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 26
+	cmp:  cmp LT.add 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	add  goto 46
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 27
+	cmp:  cmp LE.add 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	add  goto 47
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 28
+	cmp:  cmp GT.add 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	add  goto 48
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 29
+	cmp:  cmp GE.add 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	add  goto 49
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 30
+	add:  add PLUS.mul 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	mul  goto 50
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 31
+	add:  add MINUS.mul 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	mul  goto 51
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 32
+	mul:  mul STAR.unary 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	unary  goto 52
+	post  goto 10
+	atom  goto 13
+
+state 33
+	mul:  mul SLASH.unary 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	unary  goto 53
+	post  goto 10
+	atom  goto 13
+
+state 34
+	mul:  mul PERCENT.unary 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	unary  goto 54
+	post  goto 10
+	atom  goto 13
+
+state 35
+	post:  post DOT.IDENT 
+
+	IDENT  shift 55
+	.  error
+
+
+state 36
+	post:  post LBRACK.expr RBRACK 
+	post:  post LBRACK.expr COLON expr RBRACK 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	expr  goto 56
+	pipe  goto 3
+	or  goto 4
+	and  goto 5
+	cmp  goto 6
+	add  goto 7
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 37
+	unary:  MINUS unary.    (24)
+
+	.  reduce 24 (src line 87)
+
+
+38: shift/reduce conflict (shift 57(0), red'n 25(0)) on ARROW
+state 38
+	unary:  OVER unary.    (25)
+	unary:  OVER unary.ARROW LPAREN expr RPAREN 
+
+	ARROW  shift 57
+	.  reduce 25 (src line 88)
+
+
+state 39
+	post:  IDENT LPAREN.RPAREN 
+	post:  IDENT LPAREN.arg_list RPAREN 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	RPAREN  shift 58
+	OVER  shift 12
+	.  error
+
+	arg_list  goto 59
+	expr  goto 60
+	pipe  goto 3
+	or  goto 4
+	and  goto 5
+	cmp  goto 6
+	add  goto 7
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 40
+	atom:  LPAREN expr.RPAREN 
+
+	RPAREN  shift 61
+	.  error
+
+
+state 41
+	pipe:  pipe PIPE or.    (4)
+	or:  or.OROR and 
+
+	OROR  shift 22
+	.  reduce 4 (src line 48)
+
+
+state 42
+	or:  or OROR and.    (6)
+	and:  and.ANDAND cmp 
+
+	ANDAND  shift 23
+	.  reduce 6 (src line 53)
+
+
+state 43
+	and:  and ANDAND cmp.    (8)
+	cmp:  cmp.EQ add 
+	cmp:  cmp.NEQ add 
+	cmp:  cmp.LT add 
+	cmp:  cmp.LE add 
+	cmp:  cmp.GT add 
+	cmp:  cmp.GE add 
+
+	EQ  shift 24
+	NEQ  shift 25
+	LT  shift 26
+	LE  shift 27
+	GT  shift 28
+	GE  shift 29
+	.  reduce 8 (src line 58)
+
+
+state 44
+	cmp:  cmp EQ add.    (10)
+	add:  add.PLUS mul 
+	add:  add.MINUS mul 
+
+	PLUS  shift 30
+	MINUS  shift 31
+	.  reduce 10 (src line 63)
+
+
+state 45
+	cmp:  cmp NEQ add.    (11)
+	add:  add.PLUS mul 
+	add:  add.MINUS mul 
+
+	PLUS  shift 30
+	MINUS  shift 31
+	.  reduce 11 (src line 64)
+
+
+state 46
+	cmp:  cmp LT add.    (12)
+	add:  add.PLUS mul 
+	add:  add.MINUS mul 
+
+	PLUS  shift 30
+	MINUS  shift 31
+	.  reduce 12 (src line 65)
+
+
+state 47
+	cmp:  cmp LE add.    (13)
+	add:  add.PLUS mul 
+	add:  add.MINUS mul 
+
+	PLUS  shift 30
+	MINUS  shift 31
+	.  reduce 13 (src line 66)
+
+
+state 48
+	cmp:  cmp GT add.    (14)
+	add:  add.PLUS mul 
+	add:  add.MINUS mul 
+
+	PLUS  shift 30
+	MINUS  shift 31
+	.  reduce 14 (src line 67)
+
+
+state 49
+	cmp:  cmp GE add.    (15)
+	add:  add.PLUS mul 
+	add:  add.MINUS mul 
+
+	PLUS  shift 30
+	MINUS  shift 31
+	.  reduce 15 (src line 68)
+
+
+state 50
+	add:  add PLUS mul.    (17)
+	mul:  mul.STAR unary 
+	mul:  mul.SLASH unary 
+	mul:  mul.PERCENT unary 
+
+	STAR  shift 32
+	SLASH  shift 33
+	PERCENT  shift 34
+	.  reduce 17 (src line 73)
+
+
+state 51
+	add:  add MINUS mul.    (18)
+	mul:  mul.STAR unary 
+	mul:  mul.SLASH unary 
+	mul:  mul.PERCENT unary 
+
+	STAR  shift 32
+	SLASH  shift 33
+	PERCENT  shift 34
+	.  reduce 18 (src line 74)
+
+
+state 52
+	mul:  mul STAR unary.    (20)
+
+	.  reduce 20 (src line 79)
+
+
+state 53
+	mul:  mul SLASH unary.    (21)
+
+	.  reduce 21 (src line 80)
+
+
+state 54
+	mul:  mul PERCENT unary.    (22)
+
+	.  reduce 22 (src line 81)
+
+
+state 55
+	post:  post DOT IDENT.    (28)
+
+	.  reduce 28 (src line 95)
+
+
+state 56
+	post:  post LBRACK expr.RBRACK 
+	post:  post LBRACK expr.COLON expr RBRACK 
+
+	RBRACK  shift 62
+	COLON  shift 63
+	.  error
+
+
+state 57
+	unary:  OVER unary ARROW.LPAREN expr RPAREN 
+
+	LPAREN  shift 64
+	.  error
+
+
+state 58
+	post:  IDENT LPAREN RPAREN.    (31)
+
+	.  reduce 31 (src line 102)
+
+
+state 59
+	post:  IDENT LPAREN arg_list.RPAREN 
+	arg_list:  arg_list.COMMA expr 
+
+	RPAREN  shift 65
+	COMMA  shift 66
+	.  error
+
+
+state 60
+	arg_list:  expr.    (33)
+
+	.  reduce 33 (src line 116)
+
+
+state 61
+	atom:  LPAREN expr RPAREN.    (41)
+
+	.  reduce 41 (src line 129)
+
+
+state 62
+	post:  post LBRACK expr RBRACK.    (29)
+
+	.  reduce 29 (src line 100)
+
+
+state 63
+	post:  post LBRACK expr COLON.expr RBRACK 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	expr  goto 67
+	pipe  goto 3
+	or  goto 4
+	and  goto 5
+	cmp  goto 6
+	add  goto 7
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 64
+	unary:  OVER unary ARROW LPAREN.expr RPAREN 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	expr  goto 68
+	pipe  goto 3
+	or  goto 4
+	and  goto 5
+	cmp  goto 6
+	add  goto 7
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 65
+	post:  IDENT LPAREN arg_list RPAREN.    (32)
+
+	.  reduce 32 (src line 108)
+
+
+state 66
+	arg_list:  arg_list COMMA.expr 
+
+	IDENT  shift 14
+	NUMBER  shift 15
+	STRING  shift 16
+	TRUE  shift 17
+	FALSE  shift 18
+	NULL  shift 19
+	MINUS  shift 11
+	LPAREN  shift 20
+	OVER  shift 12
+	.  error
+
+	expr  goto 69
+	pipe  goto 3
+	or  goto 4
+	and  goto 5
+	cmp  goto 6
+	add  goto 7
+	mul  goto 8
+	unary  goto 9
+	post  goto 10
+	atom  goto 13
+
+state 67
+	post:  post LBRACK expr COLON expr.RBRACK 
+
+	RBRACK  shift 70
+	.  error
+
+
+state 68
+	unary:  OVER unary ARROW LPAREN expr.RPAREN 
+
+	RPAREN  shift 71
+	.  error
+
+
+state 69
+	arg_list:  arg_list COMMA expr.    (34)
+
+	.  reduce 34 (src line 118)
+
+
+state 70
+	post:  post LBRACK expr COLON expr RBRACK.    (30)
+
+	.  reduce 30 (src line 101)
+
+
+state 71
+	unary:  OVER unary ARROW LPAREN expr RPAREN.    (26)
+
+	.  reduce 26 (src line 89)
+
+
+33 terminals, 13 nonterminals
+42 grammar rules, 72/16000 states
+1 shift/reduce, 0 reduce/reduce conflicts reported
+62 working sets used
+memory: parser 146/240000
+66 extra closures
+261 shift entries, 1 exceptions
+34 goto entries
+112 entries saved by goto default
+Optimizer space used: output 80/240000
+80 table entries, 0 zero
+maximum spread: 32, maximum offset: 66

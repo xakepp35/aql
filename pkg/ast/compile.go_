@@ -1,0 +1,206 @@
+package ast
+
+import (
+	"fmt"
+
+	"github.com/xakepp35/aql/internal/vmi"
+)
+
+func (n *Number) Compile(e vmi.Emitter) error {
+	e.EmitOps(op.PushNum)
+	e.EmitArgStr(string(n.Text))
+	return nil
+}
+
+func (s *String) Compile(e vmi.Emitter) error {
+	e.EmitOps(op.PushStr)
+	e.EmitArgStr(string(s.Text))
+	return nil
+}
+
+func (b *Bool) Compile(e vmi.Emitter) error {
+	e.EmitOps(op.PushBool)
+	if b.Val {
+		e.EmitArg(1)
+	} else {
+		e.EmitArg(0)
+	}
+	return nil
+}
+
+func (n *Null) Compile(e vmi.Emitter) error {
+	e.EmitOps(op.PushNull)
+	return nil
+}
+
+func (i *Ident) Compile(e vmi.Emitter) error {
+	e.EmitOps(op.PushVar)
+	e.EmitArgStr(string(i.Name))
+	return nil
+}
+
+// ---------- унарное ----------
+
+func (u *UnaryExpr) Compile(e Emitter) error {
+	if err := u.X.Compile(e); err != nil {
+		return err
+	}
+	switch u.Op {
+	case "-":
+		// реализуем отрицание как "push 0; swap; sub"
+		e.EmitOps(OpPushNum)
+		e.EmitArgStr("0")
+		e.EmitOps(OpSwap) // нужна доп-инстр., либо сделать OpNeg
+		e.EmitOps(OpSub)
+	default:
+		return fmt.Errorf("unsupported unary op: %s", u.Op)
+	}
+	return nil
+}
+
+// ---------- бинарное ----------
+
+func (b *BinaryExpr) Compile(e Emitter) error {
+	if err := b.Left.Compile(e); err != nil {
+		return err
+	}
+	if err := b.Right.Compile(e); err != nil {
+		return err
+	}
+	switch b.Op {
+	case "+":
+		e.EmitOps(OpAdd)
+	case "-":
+		e.EmitOps(OpSub)
+	case "*":
+		e.EmitOps(OpMul)
+	case "/":
+		e.EmitOps(OpDiv)
+	case "%":
+		e.EmitOps(OpMod)
+	default:
+		return fmt.Errorf("unknown binary op %q", b.Op)
+	}
+	return nil
+}
+
+// ---------- сравнения ----------
+
+func (c *CompareExpr) Compile(e Emitter) error {
+	if err := c.Left.Compile(e); err != nil {
+		return err
+	}
+	if err := c.Right.Compile(e); err != nil {
+		return err
+	}
+	switch c.Op {
+	case "==":
+		e.EmitOps(OpEq)
+	case "!=":
+		e.EmitOps(OpNeq)
+	case "<":
+		e.EmitOps(OpLt)
+	case "<=":
+		e.EmitOps(OpLe)
+	case ">":
+		e.EmitOps(OpGt)
+	case ">=":
+		e.EmitOps(OpGe)
+	default:
+		return fmt.Errorf("unknown compare op %q", c.Op)
+	}
+	return nil
+}
+
+// ---------- логика ----------
+
+func (l *LogicalExpr) Compile(e Emitter) error {
+	if err := l.Left.Compile(e); err != nil {
+		return err
+	}
+	if err := l.Right.Compile(e); err != nil {
+		return err
+	}
+	switch l.Op {
+	case "&&":
+		e.EmitOps(OpAnd)
+	case "||":
+		e.EmitOps(OpOr)
+	default:
+		return fmt.Errorf("unknown logical op %q", l.Op)
+	}
+	return nil
+}
+
+// ---------- вызовы ----------
+
+func (c *CallExpr) Compile(e Emitter) error {
+	for _, a := range c.Args {
+		if err := a.Compile(e); err != nil {
+			return err
+		}
+	}
+	e.EmitOps(OpCall)
+	e.EmitArgStr(string(c.Fun))
+	e.EmitArg(uint32(len(c.Args)))
+	return nil
+}
+
+// ---------- селекторы ----------
+
+func (f *FieldSel) Compile(e Emitter) error {
+	if err := f.X.Compile(e); err != nil {
+		return err
+	}
+	e.EmitOps(OpField)
+	e.EmitArgStr(string(f.Name))
+	return nil
+}
+
+func (ix *IndexExpr) Compile(e Emitter) error {
+	if err := ix.X.Compile(e); err != nil {
+		return err
+	}
+	if err := ix.I.Compile(e); err != nil {
+		return err
+	}
+	if ix.J == nil {
+		e.EmitOps(OpIndex1)
+	} else {
+		if err := ix.J.Compile(e); err != nil {
+			return err
+		}
+		e.EmitOps(OpIndex2)
+	}
+	return nil
+}
+
+// ---------- Pipe & Over ----------
+
+func (p *PipeExpr) Compile(e Emitter) error {
+	if err := p.Left.Compile(e); err != nil {
+		return err
+	}
+	if err := p.Right.Compile(e); err != nil {
+		return err
+	}
+	e.EmitOps(OpPipe)
+	return nil
+}
+
+func (o *OverExpr) Compile(e Emitter) error {
+	// Seq
+	if err := o.Seq.Compile(e); err != nil {
+		return err
+	}
+	// Scope (может быть nil)
+	if o.Scope != nil {
+		if err := o.Scope.Compile(e); err != nil {
+			return err
+		}
+	} else {
+		e.EmitOps(OpPushNull) // пустой scope
+	}
+	e.EmitOps(OpOver)
+	return nil
+}
