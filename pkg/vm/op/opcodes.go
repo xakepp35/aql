@@ -45,6 +45,32 @@ const (
 	Gt
 	Ge
 
+	// stats
+	Avg
+	Count
+	Min
+	Max
+	Topk
+
+	// converters
+
+	ToInt
+	ToFloat
+	ToString
+	ToBool
+	ToTime
+
+	// crypto
+
+	FNV1a
+
+	// data formats
+
+	PackKV
+	PackJSON
+	UnpackJSON
+	UnpackKV
+
 	// data
 
 	Pipe
@@ -59,15 +85,6 @@ const (
 	RBSeek    // root + lo + hi → rbSeekIter
 	Limit     // + n → limitIter
 	Batch     //iterator + n → batchIter (для групповго commit)
-
-	FNV1a
-
-	// data formats
-
-	PackKV
-	PackJSON
-	UnpackJSON
-	UnpackKV
 
 	//
 	From

@@ -90,7 +90,7 @@ const aqlEofCode = 1
 const aqlErrCode = 2
 const aqlInitialStackSize = 16
 
-//line aql.y:131
+//line aql.y:144
 
 //line yacctab:1
 var aqlExca = [...]int8{
@@ -648,33 +648,46 @@ aqldefault:
 //line aql.y:102
 		{
 			c := aqllex.(*Compiler)
-			c.EmitString(string(aqlDollar[1].b)) // имя функции
-			c.EmitInt(0)                         // arg-count
-			c.EmitOps(op.Call)
+			name := string(aqlDollar[1].b)
+			if builtin, ok := Builtins[name]; ok {
+				c.EmitInt(0)
+				c.EmitOps(builtin)
+			} else {
+				c.EmitString(name)
+				c.EmitInt(0)
+				c.EmitOps(op.Call)
+			}
 		}
 	case 32:
 		aqlDollar = aqlS[aqlpt-4 : aqlpt+1]
-//line aql.y:108
+//line aql.y:114
 		{
 			c := aqllex.(*Compiler)
-			c.EmitString(string(aqlDollar[1].b))
-			c.EmitOps(op.Call)
+			name := string(aqlDollar[1].b)
+			if builtin, ok := Builtins[name]; ok {
+				c.EmitInt(aqlDollar[3].i) // arg count
+				c.EmitOps(builtin)
+			} else {
+				c.EmitString(name)
+				c.EmitInt(aqlDollar[3].i)
+				c.EmitOps(op.Call)
+			}
 		}
 	case 33:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:117
+//line aql.y:130
 		{
 			aqlVAL.i = 1
 		}
 	case 34:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:118
+//line aql.y:131
 		{
 			aqlVAL.i = aqlDollar[1].i + 1
 		}
 	case 35:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:123
+//line aql.y:136
 		{
 			c := aqllex.(*Compiler)
 			c.EmitString(string(aqlDollar[1].b))
@@ -682,37 +695,37 @@ aqldefault:
 		}
 	case 36:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:124
+//line aql.y:137
 		{
 			aqllex.(*Compiler).EmitInt(parseInt(aqlDollar[1].b))
 		}
 	case 37:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:125
+//line aql.y:138
 		{
 			aqllex.(*Compiler).EmitString(string(aqlDollar[1].b))
 		}
 	case 38:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:126
+//line aql.y:139
 		{
 			aqllex.(*Compiler).EmitBool(true)
 		}
 	case 39:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:127
+//line aql.y:140
 		{
 			aqllex.(*Compiler).EmitBool(false)
 		}
 	case 40:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:128
+//line aql.y:141
 		{
 			aqllex.(*Compiler).EmitNull()
 		}
 	case 41:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:129
+//line aql.y:142
 		{ /* только группировка, ничего не эмитим */
 		}
 	}

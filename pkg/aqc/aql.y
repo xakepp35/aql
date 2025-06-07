@@ -100,15 +100,28 @@ post:
   | post LBRACK expr RBRACK           { aqllex.(*Compiler).EmitOps(op.Index1) }
   | post LBRACK expr COLON expr RBRACK { aqllex.(*Compiler).EmitOps(op.Index2) }
   | IDENT LPAREN RPAREN {
-        c:=aqllex.(*Compiler)
-        c.EmitString(string($1))  // имя функции
-        c.EmitInt(0)              // arg-count
-        c.EmitOps(op.Call)
+      c:=aqllex.(*Compiler)
+      name := string($1)
+      if builtin, ok := Builtins[name]; ok {
+          c.EmitInt(0)
+          c.EmitOps(builtin)
+      } else {
+          c.EmitString(name)
+          c.EmitInt(0)
+          c.EmitOps(op.Call)
+      }
   }
   | IDENT LPAREN arg_list RPAREN {
-        c:=aqllex.(*Compiler)
-        c.EmitString(string($1))
-        c.EmitOps(op.Call)
+      c := aqllex.(*Compiler)
+      name := string($1)
+      if builtin, ok := Builtins[name]; ok {
+          c.EmitInt($3)  // arg count
+          c.EmitOps(builtin)
+      } else {
+          c.EmitString(name)
+          c.EmitInt($3)
+          c.EmitOps(op.Call)
+      }
   }
 ;
 
