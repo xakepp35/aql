@@ -45,48 +45,49 @@ expr:
 
 pipe:
     or
-  | pipe PIPE or   { aqllex.(*Compiler).EmitOps(op.Pipe) }
+  | pipe PIPE or   { }
+  /* | pipe PIPE or   { aqllex.(*Compiler).Ops(op.Pipe) } */
   ;
 
 or:
     and
-  | or OROR and    { aqllex.(*Compiler).EmitOps(op.Or) }
+  | or OROR and    { aqllex.(*Compiler).Ops(op.Or) }
   ;
 
 and:
     cmp
-  | and ANDAND cmp { aqllex.(*Compiler).EmitOps(op.And) }
+  | and ANDAND cmp { aqllex.(*Compiler).Ops(op.And) }
   ;
 
 cmp:
     add
-  | cmp EQ  add    { aqllex.(*Compiler).EmitOps(op.Eq) }
-  | cmp NEQ add    { aqllex.(*Compiler).EmitOps(op.Neq) }
-  | cmp LT  add    { aqllex.(*Compiler).EmitOps(op.Lt) }
-  | cmp LE  add    { aqllex.(*Compiler).EmitOps(op.Le) }
-  | cmp GT  add    { aqllex.(*Compiler).EmitOps(op.Gt) }
-  | cmp GE  add    { aqllex.(*Compiler).EmitOps(op.Ge) }
+  | cmp EQ  add    { aqllex.(*Compiler).Ops(op.Eq) }
+  | cmp NEQ add    { aqllex.(*Compiler).Ops(op.Neq) }
+  | cmp LT  add    { aqllex.(*Compiler).Ops(op.Lt) }
+  | cmp LE  add    { aqllex.(*Compiler).Ops(op.Le) }
+  | cmp GT  add    { aqllex.(*Compiler).Ops(op.Gt) }
+  | cmp GE  add    { aqllex.(*Compiler).Ops(op.Ge) }
   ;
 
 add:
     mul
-  | add PLUS  mul  { aqllex.(*Compiler).EmitOps(op.Add) }
-  | add MINUS mul  { aqllex.(*Compiler).EmitOps(op.Sub) }
+  | add PLUS  mul  { aqllex.(*Compiler).Ops(op.Add) }
+  | add MINUS mul  { aqllex.(*Compiler).Ops(op.Sub) }
   ;
 
 mul:
     unary
-  | mul STAR    unary  { aqllex.(*Compiler).EmitOps(op.Mul) }
-  | mul SLASH   unary  { aqllex.(*Compiler).EmitOps(op.Div) }
-  | mul PERCENT unary  { aqllex.(*Compiler).EmitOps(op.Mod) }
+  | mul STAR    unary  { aqllex.(*Compiler).Ops(op.Mul) }
+  | mul SLASH   unary  { aqllex.(*Compiler).Ops(op.Div) }
+  | mul PERCENT unary  { aqllex.(*Compiler).Ops(op.Mod) }
   ;
 
 /* ┌───────────── унарный ─────────────┐ */
 unary:
     post
-  | MINUS unary %prec UMINUS { aqllex.(*Compiler).EmitOps(op.Not) }
-  | OVER unary               { aqllex.(*Compiler).EmitNull(); aqllex.(*Compiler).EmitOps(op.Over) }
-  | OVER unary ARROW LPAREN expr RPAREN { aqllex.(*Compiler).EmitOps(op.Over) }
+  | MINUS unary %prec UMINUS { aqllex.(*Compiler).Ops(op.Not) }
+  | OVER unary               { aqllex.(*Compiler).Null(); aqllex.(*Compiler).Ops(op.Over) }
+  | OVER unary ARROW LPAREN expr RPAREN { aqllex.(*Compiler).Ops(op.Over) }
   ;
 
 /* ┌───────────── постфикс ─────────────┐ */
@@ -94,34 +95,22 @@ post:
     atom
   | post DOT IDENT { 
         c:=aqllex.(*Compiler); 
-        c.EmitString(string($3)); 
-        c.EmitOps(op.Field) 
+        c.String(string($3)); 
+        c.Ops(op.Field) 
   }
-  | post LBRACK expr RBRACK           { aqllex.(*Compiler).EmitOps(op.Index1) }
-  | post LBRACK expr COLON expr RBRACK { aqllex.(*Compiler).EmitOps(op.Index2) }
+  | post LBRACK expr RBRACK           { aqllex.(*Compiler).Ops(op.Index1) }
+  | post LBRACK expr COLON expr RBRACK { aqllex.(*Compiler).Ops(op.Index2) }
   | IDENT LPAREN RPAREN {
-      c:=aqllex.(*Compiler)
-      name := string($1)
-      if builtin, ok := Builtins[name]; ok {
-          c.EmitInt(0)
-          c.EmitOps(builtin)
-      } else {
-          c.EmitString(name)
-          c.EmitInt(0)
-          c.EmitOps(op.Call)
-      }
+      c := aqllex.(*Compiler)
+      c.String(string($1))
+      c.Int(0)
+      c.Ops(op.Call)
   }
   | IDENT LPAREN arg_list RPAREN {
       c := aqllex.(*Compiler)
-      name := string($1)
-      if builtin, ok := Builtins[name]; ok {
-          c.EmitInt($3)  // arg count
-          c.EmitOps(builtin)
-      } else {
-          c.EmitString(name)
-          c.EmitInt($3)
-          c.EmitOps(op.Call)
-      }
+      c.String(string($1))
+      c.Int($3)
+      c.Ops(op.Call)
   }
 ;
 
@@ -133,12 +122,13 @@ arg_list:
 
 /* ┌───────────── атомы ─────────────┐ */
 atom:
-    IDENT   { c:=aqllex.(*Compiler); c.EmitString(string($1)); c.EmitOps(op.PushVar) }
-  | NUMBER  { aqllex.(*Compiler).EmitInt(parseInt($1)) }
-  | STRING  { aqllex.(*Compiler).EmitString(string($1)) }
-  | TRUE    { aqllex.(*Compiler).EmitBool(true)  }
-  | FALSE   { aqllex.(*Compiler).EmitBool(false) }
-  | NULL    { aqllex.(*Compiler).EmitNull() }
+    IDENT   { c:=aqllex.(*Compiler); c.String(string($1)); c.Ops(op.Id) }
+  | NUMBER  { aqllex.(*Compiler).Int(parseInt($1)) }
+  | STRING  { aqllex.(*Compiler).String(string($1)) }
+  | TRUE    { aqllex.(*Compiler).Bool(true)  }
+  | FALSE   { aqllex.(*Compiler).Bool(false) }
+  | NULL    { aqllex.(*Compiler).Null() }
+  | DOT     { aqllex.(*Compiler).Ops(op.Dup) }
   | LPAREN expr RPAREN { /* только группировка, ничего не эмитим */ }
   ;
 %%

@@ -6,16 +6,19 @@ import (
 	"github.com/xakepp35/aql/pkg/util"
 )
 
-var (
-	ErrStackUnderflow   = errors.New("stack underflow")
-	ErrStackUnsupported = errors.New("stack unsupported")
-	ErrStackMissingPC   = errors.New("stack missing pc")
-	ErrStackUniterable  = errors.New("stack uniterable")
-	ErrDivisionByZero   = errors.New("division by zero")
-	ErrModuloByZero     = errors.New("modulo by zero")
-)
+func StackUnderflow(args ...any) error {
+	return util.EWrap(ErrStackUnderflow, args...)
+}
 
 //go:inline
 func StackUnsupported(args ...any) error {
 	return util.EWrap(ErrStackUnsupported, util.ToTypes(args...))
+}
+
+func FunctionUndefined(name string) error {
+	return util.EWrap(ErrFunctionUndefined, name)
+}
+
+func VariableUndefined(name string) error {
+	return util.EWrap(ErrVariableUndefined, name)
 }

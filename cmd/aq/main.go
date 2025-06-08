@@ -16,14 +16,16 @@ func usage() {
 }
 
 func main() {
-	if len(os.Args) < 3 {
+	if len(os.Args) < 2 {
 		usage()
 		os.Exit(1)
 	}
-
-	cmd := os.Args[1]
-	program := os.Args[2]
-
+	program := os.Args[1]
+	cmd := "run"
+	if len(os.Args) > 2 {
+		cmd = os.Args[1]
+		program = os.Args[2]
+	}
 	switch cmd {
 	case "run":
 		err := main_run(program)
@@ -59,7 +61,7 @@ func main_run(src string) error {
 }
 
 func main_compile(src string) error {
-	e := vm.NewCompiler()
+	e := vm.NewProgrammer()
 	if err := aqc.Compile([]byte(src), e); err != nil {
 		return fmt.Errorf("compile: %w", err)
 	}

@@ -8,7 +8,7 @@ import "github.com/xakepp35/aql/pkg/vmi"
 type Variables map[string]any
 
 //go:inline
-func NewVariables() vmi.Variables {
+func NewVariables() vmi.Variabler {
 	return make(Variables)
 }
 
@@ -30,8 +30,9 @@ func (s Variables) Set(k string, v any) {
 }
 
 //go:inline
-func (s Variables) Get(k string) any {
-	return s[k]
+func (s Variables) Get(k string) (any, bool) {
+	v, ok := s[k]
+	return v, ok
 }
 
 //go:inline

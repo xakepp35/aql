@@ -35,17 +35,17 @@ type topK struct {
 
 /* step-opcode, генерируется curry-функцией */
 
-func NewTopKOp(k int) func(vmi.State) {
-	return func(st vmi.State) {
-		a := st.Args(2)
+func NewTopKOp(k int) func(vmi.VM) {
+	return func(this vmi.VM) {
+		a := this.Args(2)
 		if a == nil {
-			st.SetErr(ErrStackUnderflow)
+			this.SetErr(ErrStackUnderflow)
 			return
 		}
 
 		acc, ok := a[0].(*topK)
 		if !ok {
-			st.SetErr(StackUnsupported(a[0]))
+			this.SetErr(StackUnsupported(a[0]))
 			return
 		}
 		key := a[1]
@@ -62,12 +62,12 @@ func NewTopKOp(k int) func(vmi.State) {
 			acc.H[0] = *e
 			heap.Fix(&acc.H, 0)
 		}
-		st.Push(acc) // вернуть обновлённый аккумулятор
+		this.Push(acc) // вернуть обновлённый аккумулятор
 	}
 }
 
 // финальный op
-func TopKFinal(st vmi.State) {
+func TopKFinal(st vmi.VM) {
 	a := st.Args(1)
 	if a == nil {
 		st.SetErr(ErrStackUnderflow)

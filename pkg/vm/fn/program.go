@@ -17,14 +17,14 @@ func NewJIT(prog ...op.Code) JIT {
 }
 
 //go:inline
-func (f JIT) Run(this vmi.State) {
+func (f JIT) Run(this vmi.VM) {
 	this.Runf(vmi.JIT(f))
 }
 
 //go:inline
-type Program vmi.Program
+type Program vmi.ByteCode
 
 //go:inline
-func (p Program) Run(this vmi.State) {
-	this.Run(vmi.Program(p))
+func (p Program) Run(this vmi.VM) {
+	this.Run(vmi.ByteCode(p))
 }

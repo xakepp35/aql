@@ -5,8 +5,12 @@ import (
 )
 
 // Add pops two numbers, adds them, and pushes the sum.
-func Add(this vmi.State) {
+func Add(this vmi.VM) {
 	a := this.Args(2)
+	if a == nil {
+		this.SetErr(StackUnderflow(this.Dump()...))
+		return
+	}
 	switch l := a[0].(type) {
 	case int64:
 		if r, ok := a[1].(int64); ok {
@@ -55,8 +59,12 @@ func Add(this vmi.State) {
 }
 
 // Sub pops two numbers, subtracts them, and pushes the difference.
-func Sub(this vmi.State) {
+func Sub(this vmi.VM) {
 	a := this.Args(2)
+	if a == nil {
+		this.SetErr(StackUnderflow(this.Dump()...))
+		return
+	}
 	switch l := a[0].(type) {
 	case int64:
 		if r, ok := a[1].(int64); ok {
@@ -73,8 +81,12 @@ func Sub(this vmi.State) {
 }
 
 // Mul pops two numbers, multiplies them, and pushes the product.
-func Mul(this vmi.State) {
+func Mul(this vmi.VM) {
 	a := this.Args(2)
+	if a == nil {
+		this.SetErr(StackUnderflow(this.Dump()...))
+		return
+	}
 	switch l := a[0].(type) {
 	case int64:
 		if r, ok := a[1].(int64); ok {
@@ -91,8 +103,12 @@ func Mul(this vmi.State) {
 }
 
 // Div pops two numbers, divides them, and pushes the quotient.
-func Div(this vmi.State) {
+func Div(this vmi.VM) {
 	a := this.Args(2)
+	if a == nil {
+		this.SetErr(StackUnderflow(this.Dump()...))
+		return
+	}
 	switch l := a[0].(type) {
 	case int64:
 		if r, ok := a[1].(int64); ok {
@@ -117,8 +133,12 @@ func Div(this vmi.State) {
 }
 
 // Mod pops two numbers, computes modulus, and pushes the result.
-func Mod(this vmi.State) {
+func Mod(this vmi.VM) {
 	a := this.Args(2)
+	if a == nil {
+		this.SetErr(StackUnderflow(this.Dump()...))
+		return
+	}
 	rf, ok1 := a[1].(int64)
 	lf, ok2 := a[0].(int64)
 	if !ok1 || !ok2 {

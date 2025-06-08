@@ -45,51 +45,51 @@ expr:
 
 pipe:
     or
-  | pipe PIPE or   { aqllex.(*Compiler).EmitOps(op.Pipe) }
+  | pipe PIPE or   { aqllex.(*Compiler).Ops(op.Pipe) }
   ;
 
 or:
     and
-  | or OROR and    { aqllex.(*Compiler).EmitOps(op.Or) }
+  | or OROR and    { aqllex.(*Compiler).Ops(op.Or) }
   ;
 
 and:
     cmp
-  | and ANDAND cmp { aqllex.(*Compiler).EmitOps(op.And) }
+  | and ANDAND cmp { aqllex.(*Compiler).Ops(op.And) }
   ;
 
 /* ─────────── сравнения ─────────── */
 cmp:
     add
-  | cmp EQ  add    { aqllex.(*Compiler).EmitOps(op.Eq) }
-  | cmp NEQ add    { aqllex.(*Compiler).EmitOps(op.Neq) }
-  | cmp LT  add    { aqllex.(*Compiler).EmitOps(op.Lt) }
-  | cmp LE  add    { aqllex.(*Compiler).EmitOps(op.Le) }
-  | cmp GT  add    { aqllex.(*Compiler).EmitOps(op.Gt) }
-  | cmp GE  add    { aqllex.(*Compiler).EmitOps(op.Ge) }
+  | cmp EQ  add    { aqllex.(*Compiler).Ops(op.Eq) }
+  | cmp NEQ add    { aqllex.(*Compiler).Ops(op.Neq) }
+  | cmp LT  add    { aqllex.(*Compiler).Ops(op.Lt) }
+  | cmp LE  add    { aqllex.(*Compiler).Ops(op.Le) }
+  | cmp GT  add    { aqllex.(*Compiler).Ops(op.Gt) }
+  | cmp GE  add    { aqllex.(*Compiler).Ops(op.Ge) }
   ;
   
 /* ───── арифметика ± ───── */
 add:
     mul
-  | add PLUS  mul  { aqllex.(*Compiler).EmitOps(op.Add) }
-  | add MINUS mul  { aqllex.(*Compiler).EmitOps(op.Sub) }
+  | add PLUS  mul  { aqllex.(*Compiler).Ops(op.Add) }
+  | add MINUS mul  { aqllex.(*Compiler).Ops(op.Sub) }
   ;
 
 mul:
     unary
-  | mul STAR    unary  { aqllex.(*Compiler).EmitOps(op.Mul) }
-  | mul SLASH   unary  { aqllex.(*Compiler).EmitOps(op.Div) }
-  | mul PERCENT unary  { aqllex.(*Compiler).EmitOps(op.Mod) }
+  | mul STAR    unary  { aqllex.(*Compiler).Ops(op.Mul) }
+  | mul SLASH   unary  { aqllex.(*Compiler).Ops(op.Div) }
+  | mul PERCENT unary  { aqllex.(*Compiler).Ops(op.Mod) }
   ;
 
 /* ┌───────────── унарный ─────────────┐ */
 unary:
     post
-  | MINUS unary %prec UMINUS { aqllex.(*Compiler).EmitOps(op.Not) }
-  | OVER unary               { aqllex.(*Compiler).EmitNull(); aqllex.(*Compiler).EmitOps(op.Over) }
-  | OVER unary ARROW LPAREN expr RPAREN { aqllex.(*Compiler).EmitOps(op.Over) }
-  | NOT unary                { aqllex.(*Compiler).EmitOps(op.Not) }   /* унарный ! */
+  | MINUS unary %prec UMINUS { aqllex.(*Compiler).Ops(op.Not) }
+  | OVER unary               { aqllex.(*Compiler).Null(); aqllex.(*Compiler).Ops(op.Over) }
+  | OVER unary ARROW LPAREN expr RPAREN { aqllex.(*Compiler).Ops(op.Over) }
+  | NOT unary                { aqllex.(*Compiler).Ops(op.Not) }   /* унарный ! */
   ;
 
 /* ┌───────────── постфикс ─────────────┐ */
@@ -97,20 +97,20 @@ post:
     atom
   | post DOT IDENT { 
         c:=aqllex.(*Compiler); 
-        c.EmitString(string($3)); 
-        c.EmitOps(op.Field) 
+        c.String(string($3)); 
+        c.Ops(op.Field) 
   }
-  | post LBRACK expr RBRACK           { aqllex.(*Compiler).EmitOps(op.Index1) }
-  | post LBRACK expr COLON expr RBRACK { aqllex.(*Compiler).EmitOps(op.Index2) }
+  | post LBRACK expr RBRACK           { aqllex.(*Compiler).Ops(op.Index1) }
+  | post LBRACK expr COLON expr RBRACK { aqllex.(*Compiler).Ops(op.Index2) }
   | IDENT LPAREN RPAREN {
         c:=aqllex.(*Compiler)
-        c.EmitString(string($1))  // имя функции
-        c.EmitOps(op.Call)
+        c.String(string($1))  // имя функции
+        c.Ops(op.Call)
   }
   | IDENT LPAREN arg_list RPAREN {
         c:=aqllex.(*Compiler)
-        c.EmitString(string($1))
-        c.EmitOps(op.Call)
+        c.String(string($1))
+        c.Ops(op.Call)
   }
 ;
 
@@ -122,37 +122,37 @@ arg_list:
 
 /* ┌───────────── атомы ─────────────┐ */
 atom:
-    IDENT   { c:=aqllex.(*Compiler); c.EmitString(string($1)); c.EmitOps(op.PushVar) }
-  | NUMBER  { aqllex.(*Compiler).EmitInt(parseInt($1)) }
-  | STRING  { aqllex.(*Compiler).EmitString(string($1)) }
-  | TRUE    { aqllex.(*Compiler).EmitBool(true)  }
-  | FALSE   { aqllex.(*Compiler).EmitBool(false) }
-  | NULL    { aqllex.(*Compiler).EmitNull() }
+    IDENT   { c:=aqllex.(*Compiler); c.String(string($1)); c.Ops(op.Var) }
+  | NUMBER  { aqllex.(*Compiler).Int(parseInt($1)) }
+  | STRING  { aqllex.(*Compiler).String(string($1)) }
+  | TRUE    { aqllex.(*Compiler).Bool(true)  }
+  | FALSE   { aqllex.(*Compiler).Bool(false) }
+  | NULL    { aqllex.(*Compiler).Null() }
   | LPAREN expr RPAREN { /* только группировка, ничего не эмитим */ }
   ;
 
 
 /* ───── массивы ───── */
 array_lit:
-      LBRACK RBRACK                       { aqllex.(*Compiler).EmitArray(0) }
+      LBRACK RBRACK                       { aqllex.(*Compiler).Array(0) }
     | LBRACK arr_items RBRACK
     ;
 arr_items:
-      expr                                { aqllex.(*Compiler).EmitArray(1) }
+      expr                                { aqllex.(*Compiler).Array(1) }
     | arr_items COMMA expr                { aqllex.(*Compiler).IncLastArray() }
     ;
 
 /* ───── объекты ───── */
 object_lit:
-      LBRACE RBRACE                       { aqllex.(*Compiler).EmitMap(0) }
+      LBRACE RBRACE                       { aqllex.(*Compiler).Map(0) }
     | LBRACE obj_items RBRACE
     ;
 obj_items:
-      obj_pair                            { aqllex.(*Compiler).EmitMap(1) }
+      obj_pair                            { aqllex.(*Compiler).Map(1) }
     | obj_items COMMA obj_pair            { aqllex.(*Compiler).IncLastMap() }
     ;
 obj_pair:
-      IDENT COLON expr                    { c:=aqllex.(*Compiler); c.EmitString(string($1)) } /* ключ + значение уже на стеке */
-    | STRING COLON expr                   { c:=aqllex.(*Compiler); c.EmitString(string($1)) }
+      IDENT COLON expr                    { c:=aqllex.(*Compiler); c.String(string($1)) } /* ключ + значение уже на стеке */
+    | STRING COLON expr                   { c:=aqllex.(*Compiler); c.String(string($1)) }
     ;
 %%

@@ -11,19 +11,19 @@ import (
 
 func TestProgramMarshalUnmarshal(t *testing.T) {
 	t.Run("round trip", func(t *testing.T) {
-		e := vm.NewCompiler()
-		e.EmitInt(7)
-		e.EmitString("hello")
-		e.EmitBool(true)
-		e.EmitNull()
-		e.EmitOps(op.Add)
-		e.EmitOps(op.Or)
+		e := vm.NewProgrammer()
+		e.Int(7)
+		e.String("hello")
+		e.Bool(true)
+		e.Null()
+		e.Ops(op.Add)
+		e.Ops(op.Or)
 
 		bin, err := e.MarshalBinary()
 		require.NoError(t, err)
 		require.True(t, len(bin) > 0)
 
-		clone := vm.NewCompiler()
+		clone := vm.NewProgrammer()
 		err = clone.UnmarshalBinary(bin)
 		require.NoError(t, err)
 
@@ -41,15 +41,15 @@ func TestProgramMarshalUnmarshal(t *testing.T) {
 
 func TestProgramUnmarshalMarshal(t *testing.T) {
 	t.Run("manual binary round trip", func(t *testing.T) {
-		p := vm.NewCompiler()
-		p.EmitString("world")
-		p.EmitInt(99)
-		p.EmitOps(op.Add)
+		p := vm.NewProgrammer()
+		p.String("world")
+		p.Int(99)
+		p.Ops(op.Add)
 
 		bin1, err := p.MarshalBinary()
 		require.NoError(t, err)
 
-		copy := vm.NewCompiler()
+		copy := vm.NewProgrammer()
 		err = copy.UnmarshalBinary(bin1)
 		require.NoError(t, err)
 
@@ -61,13 +61,13 @@ func TestProgramUnmarshalMarshal(t *testing.T) {
 
 func TestProgramMarshalErrors(t *testing.T) {
 	t.Run("unmarshal too short", func(t *testing.T) {
-		e := vm.NewCompiler()
+		e := vm.NewProgrammer()
 		err := e.UnmarshalBinary([]byte{1, 2, 3})
 		require.Error(t, err)
 	})
 
 	t.Run("unmarshal invalid size", func(t *testing.T) {
-		e := vm.NewCompiler()
+		e := vm.NewProgrammer()
 		buf := make([]byte, 32)
 		buf[0] = 255 // total size too big
 		err := e.UnmarshalBinary(buf)

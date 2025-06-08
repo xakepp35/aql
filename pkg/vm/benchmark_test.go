@@ -14,7 +14,7 @@ func BenchmarkCompile(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e := vm.NewCompiler()
+		e := vm.NewProgrammer()
 		err := aqc.Compile(demoExpr, e)
 		if err != nil {
 			b.Fatalf("eval error: %v", err)
@@ -23,7 +23,7 @@ func BenchmarkCompile(b *testing.B) {
 }
 
 func BenchmarkCompileNoAlloc(b *testing.B) {
-	prog := vm.NewCompiler()
+	prog := vm.NewProgrammer()
 	b.SetBytes(1)
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -36,7 +36,7 @@ func BenchmarkCompileNoAlloc(b *testing.B) {
 }
 
 func BenchmarkRun(b *testing.B) {
-	e := vm.NewCompiler()
+	e := vm.NewProgrammer()
 	err := aqc.Compile(demoExpr, e)
 	if err != nil {
 		b.Fatalf("parse error: %v", err)
@@ -56,7 +56,7 @@ func BenchmarkRun(b *testing.B) {
 }
 
 func BenchmarkRunf(b *testing.B) {
-	e := vm.NewCompiler()
+	e := vm.NewProgrammer()
 	err := aqc.Compile(demoExpr, e)
 	if err != nil {
 		b.Fatalf("parse error: %v", err)

@@ -5,10 +5,10 @@ import (
 )
 
 // Not pops a boolean and pushes logical NOT. Or negates if its a number
-func Not(this vmi.State) {
+func Not(this vmi.VM) {
 	a := this.Args(1)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 	switch x := a[0].(type) {
@@ -24,10 +24,10 @@ func Not(this vmi.State) {
 }
 
 // And logical AND.
-func And(this vmi.State) {
+func And(this vmi.VM) {
 	a := this.Args(2)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 	switch a1 := a[1].(type) {
@@ -51,10 +51,10 @@ func And(this vmi.State) {
 }
 
 // Or
-func Or(this vmi.State) {
+func Or(this vmi.VM) {
 	a := this.Args(2)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 	switch a1 := a[1].(type) {
@@ -78,10 +78,10 @@ func Or(this vmi.State) {
 }
 
 // Xor
-func Xor(this vmi.State) {
+func Xor(this vmi.VM) {
 	a := this.Args(2)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 	switch a1 := a[1].(type) {

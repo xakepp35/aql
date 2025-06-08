@@ -9,7 +9,7 @@ import (
 
 // Eval плашет значения через стек, берет аргументы из state и пушит результат.
 
-func (f *FieldSel) Eval(this vmi.State) error {
+func (f *FieldSel) Eval(this vmi.VM) error {
 	// X.Eval пушит объект
 	if err := f.X.Eval(this); err != nil {
 		return err
@@ -24,7 +24,7 @@ func (f *FieldSel) Eval(this vmi.State) error {
 	return nil
 }
 
-func (i *IndexExpr) Eval(this vmi.State) error {
+func (i *IndexExpr) Eval(this vmi.VM) error {
 	// X, I, (optional J)
 	if err := i.X.Eval(this); err != nil {
 		return err
@@ -71,13 +71,13 @@ func (i *IndexExpr) Eval(this vmi.State) error {
 	return nil
 }
 
-func (p *PipeExpr) Eval(this vmi.State) error {
+func (p *PipeExpr) Eval(this vmi.VM) error {
 	// eval left, pop result, set _
 	if err := p.Left.Eval(this); err != nil {
 		return err
 	}
 	left := this.Pop()
-	prev := this.Get("_")
+	prev, _ := this.Get("_")
 	this.Set("_", left)
 	// eval right pushes result
 	if err := p.Right.Eval(this); err != nil {
@@ -89,7 +89,7 @@ func (p *PipeExpr) Eval(this vmi.State) error {
 	return nil
 }
 
-func (b *BinaryExpr) Eval(this vmi.State) error {
+func (b *BinaryExpr) Eval(this vmi.VM) error {
 	// left, right
 	if err := b.Left.Eval(this); err != nil {
 		return err
@@ -124,7 +124,7 @@ func (b *BinaryExpr) Eval(this vmi.State) error {
 	return nil
 }
 
-func (c *CompareExpr) Eval(this vmi.State) error {
+func (c *CompareExpr) Eval(this vmi.VM) error {
 	if err := c.Left.Eval(this); err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func (c *CompareExpr) Eval(this vmi.State) error {
 	return nil
 }
 
-func (l *LogicalExpr) Eval(this vmi.State) error {
+func (l *LogicalExpr) Eval(this vmi.VM) error {
 	if err := l.Left.Eval(this); err != nil {
 		return err
 	}
@@ -198,7 +198,7 @@ func (l *LogicalExpr) Eval(this vmi.State) error {
 	return nil
 }
 
-func (c *CallExpr) Eval(this vmi.State) error {
+func (c *CallExpr) Eval(this vmi.VM) error {
 	// args in order
 	args := make([]any, 0, len(c.Args))
 	for _, a := range c.Args {
@@ -218,7 +218,7 @@ func (c *CallExpr) Eval(this vmi.State) error {
 	return nil
 }
 
-func (u *UnaryExpr) Eval(this vmi.State) error {
+func (u *UnaryExpr) Eval(this vmi.VM) error {
 	if err := u.X.Eval(this); err != nil {
 		return err
 	}
@@ -236,16 +236,16 @@ func (u *UnaryExpr) Eval(this vmi.State) error {
 	}
 }
 
-func (i *Ident) Eval(this vmi.State) error {
-	val := this.Get(string(i.Name))
-	if val == nil {
+func (i *Ident) Eval(this vmi.VM) error {
+	val, ok := this.Get(string(i.Name))
+	if !ok {
 		return fmt.Errorf("undefined variable: %s", i.Name)
 	}
 	this.Push(val)
 	return nil
 }
 
-func (n *Number) Eval(this vmi.State) error {
+func (n *Number) Eval(this vmi.VM) error {
 	f, err := strconv.ParseFloat(string(n.Text), 64)
 	if err != nil {
 		return err
@@ -254,22 +254,22 @@ func (n *Number) Eval(this vmi.State) error {
 	return nil
 }
 
-func (s *String) Eval(this vmi.State) error {
+func (s *String) Eval(this vmi.VM) error {
 	this.Push(string(s.Text))
 	return nil
 }
 
-func (b *Bool) Eval(this vmi.State) error {
+func (b *Bool) Eval(this vmi.VM) error {
 	this.Push(b.Val)
 	return nil
 }
 
-func (n *Null) Eval(this vmi.State) error {
+func (n *Null) Eval(this vmi.VM) error {
 	this.Push(nil)
 	return nil
 }
 
-func (o *OverExpr) Eval(this vmi.State) error {
+func (o *OverExpr) Eval(this vmi.VM) error {
 	// просто возвращаем Seq
 	if err := o.Seq.Eval(this); err != nil {
 		return err

@@ -1,17 +1,46 @@
 package fn
 
 import (
+	"encoding/hex"
 	"strconv"
 	"time"
 
 	"github.com/xakepp35/aql/pkg/vmi"
 )
 
-// ToString пытается привести значение к string
-func ToString(this vmi.State) {
+// Bytes пытается привести значение к []byte
+func Bytes(this vmi.VM) {
 	a := this.Args(1)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
+		return
+	}
+
+	switch v := a[0].(type) {
+	case string:
+		this.Push([]byte(v))
+	case []byte:
+		this.Push(v)
+	case int64:
+		this.Push([]byte(strconv.FormatInt(v, 10)))
+	case float64:
+		this.Push([]byte(strconv.FormatFloat(v, 'f', -1, 64)))
+	case bool:
+		if v {
+			this.Push([]byte("true"))
+		} else {
+			this.Push([]byte("false"))
+		}
+	default:
+		this.SetErr(StackUnsupported(a...))
+	}
+}
+
+// String пытается привести значение к string
+func String(this vmi.VM) {
+	a := this.Args(1)
+	if a == nil {
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 
@@ -35,11 +64,11 @@ func ToString(this vmi.State) {
 	}
 }
 
-// ToFloat приводит значение к float64
-func ToFloat(this vmi.State) {
+// Float приводит значение к float64
+func Float(this vmi.VM) {
 	a := this.Args(1)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 
@@ -67,11 +96,11 @@ func ToFloat(this vmi.State) {
 	}
 }
 
-// ToInt приводит значение к int64
-func ToInt(this vmi.State) {
+// Int приводит значение к int64
+func Int(this vmi.VM) {
 	a := this.Args(1)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 
@@ -99,11 +128,11 @@ func ToInt(this vmi.State) {
 	}
 }
 
-// ToBool приводит значение к bool
-func ToBool(this vmi.State) {
+// Bool приводит значение к bool
+func Bool(this vmi.VM) {
 	a := this.Args(1)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 
@@ -129,11 +158,11 @@ func ToBool(this vmi.State) {
 	}
 }
 
-// ToTime парсит строку/[]byte в time.Time (RFC3339)
-func ToTime(this vmi.State) {
+// Time парсит строку/[]byte в time.Time (RFC3339)
+func Time(this vmi.VM) {
 	a := this.Args(1)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 
@@ -156,4 +185,24 @@ func ToTime(this vmi.State) {
 		return
 	}
 	this.Push(t)
+}
+
+// Hex преобразует значение в шестнадцатеричную строку.
+func Hex(this vmi.VM) {
+	a := this.Args(1)
+	if a == nil {
+		this.SetErr(StackUnderflow(this.Dump()...))
+		return
+	}
+
+	switch v := a[0].(type) {
+	case int64:
+		this.Push(strconv.FormatInt(v, 16)) // hex числа
+	case []byte:
+		this.Push(hex.EncodeToString(v))
+	case string:
+		this.Push(hex.EncodeToString([]byte(v)))
+	default:
+		this.SetErr(StackUnsupported(a...))
+	}
 }

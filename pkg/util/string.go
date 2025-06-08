@@ -14,6 +14,7 @@ type Stringer interface {
 	String() string
 }
 
+//go:inline
 func ToString(v any) string {
 	if s, ok := v.(Stringer); ok {
 		return s.String()

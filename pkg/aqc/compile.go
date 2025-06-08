@@ -2,26 +2,27 @@
 package aqc
 
 import (
-	"fmt"
 	"strconv"
 
+	"github.com/xakepp35/aql/pkg/asf/atf"
 	"github.com/xakepp35/aql/pkg/lexer"
+	"github.com/xakepp35/aql/pkg/util"
 	"github.com/xakepp35/aql/pkg/vmi"
 )
 
 // Compile AnyQueryLanguage bytecode compiler (see vm.Program for emitter)
-func Compile(src []byte, e vmi.Compiler) error {
+func Compile(src []byte, e atf.Emitter) error {
 	// aqlDebug = 4
 	// aqlErrorVerbose = true
-	c := &Compiler{lx: lexer.New(src), Compiler: e}
+	c := &Compiler{lx: lexer.New(src), Emitter: e}
 	if aqlParse(c) != 0 || len(c.errs) > 0 {
-		return fmt.Errorf("%w: %v", vmi.ErrCompile, c.errs)
+		return util.EWrap(vmi.ErrCompile, util.List(c.errs...)...)
 	}
 	return nil
 }
 
 type Compiler struct {
-	vmi.Compiler
+	atf.Emitter
 	lx   *lexer.Lexer
 	errs []string
 }

@@ -203,9 +203,9 @@ func TestFnNop(t *testing.T) {
 	require.NoError(t, s.Err())
 }
 
-func TestFnPushNil(t *testing.T) {
+func TestFnNil(t *testing.T) {
 	s := vm.NewState()
-	fn.PushNil(s)
+	fn.Nil(s)
 	require.NoError(t, s.Err())
 	require.Nil(t, s.Pop())
 }

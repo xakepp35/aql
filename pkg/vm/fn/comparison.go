@@ -7,30 +7,30 @@ import (
 )
 
 // FnEq pops two values, compares equality, and pushes result.
-func Eq(this vmi.State) {
+func Eq(this vmi.VM) {
 	a := this.Args(2)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 	this.Push(reflect.DeepEqual(a[0], a[1]))
 }
 
 // FnNeq pops two values, compares inequality, and pushes result.
-func Neq(this vmi.State) {
+func Neq(this vmi.VM) {
 	a := this.Args(2)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 	this.Push(!reflect.DeepEqual(a[0], a[1]))
 }
 
 // FnLt pops two numbers, compares <, and pushes result.
-func Lt(this vmi.State) {
+func Lt(this vmi.VM) {
 	a := this.Args(2)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 	switch l := a[0].(type) {
@@ -54,10 +54,10 @@ func Lt(this vmi.State) {
 }
 
 // FnLe pops two numbers, compares <=, and pushes result.
-func Le(this vmi.State) {
+func Le(this vmi.VM) {
 	a := this.Args(2)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 	switch l := a[0].(type) {
@@ -81,10 +81,10 @@ func Le(this vmi.State) {
 }
 
 // FnGt pops two numbers, compares >, and pushes result.
-func Gt(this vmi.State) {
+func Gt(this vmi.VM) {
 	a := this.Args(2)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 	switch l := a[0].(type) {
@@ -108,10 +108,10 @@ func Gt(this vmi.State) {
 }
 
 // FnGe pops two numbers, compares >=, and pushes result.
-func Ge(this vmi.State) {
+func Ge(this vmi.VM) {
 	a := this.Args(2)
 	if a == nil {
-		this.SetErr(ErrStackUnderflow)
+		this.SetErr(StackUnderflow(this.Dump()...))
 		return
 	}
 	switch l := a[0].(type) {

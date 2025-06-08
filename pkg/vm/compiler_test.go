@@ -11,12 +11,12 @@ import (
 
 func TestProgramInit(t *testing.T) {
 	t.Run("init stack from args", func(t *testing.T) {
-		e := vm.NewCompiler()
-		e.EmitInt(42)
-		e.EmitBool(true)
-		e.EmitBool(false)
-		e.EmitNull()
-		e.EmitString("hello")
+		e := vm.NewProgrammer()
+		e.Int(42)
+		e.Bool(true)
+		e.Bool(false)
+		e.Null()
+		e.String("hello")
 
 		s := vm.NewState()
 		e.Init(s)
@@ -29,7 +29,7 @@ func TestProgramInit(t *testing.T) {
 	})
 
 	t.Run("empty init", func(t *testing.T) {
-		e := vm.NewCompiler()
+		e := vm.NewProgrammer()
 		this := vm.NewState()
 		e.Init(this)
 		require.Equal(t, 0, this.Len())
@@ -45,10 +45,10 @@ func TestEmitterRunVariants(t *testing.T) {
 		{
 			name: "int64 addition",
 			init: func() vmi.Compiler {
-				e := vm.NewCompiler()
-				e.EmitInt(1)
-				e.EmitInt(2)
-				e.EmitOps(op.Add)
+				e := vm.NewProgrammer()
+				e.Int(1)
+				e.Int(2)
+				e.Ops(op.Add)
 				return e
 			},
 			expect: int64(3),
@@ -56,10 +56,10 @@ func TestEmitterRunVariants(t *testing.T) {
 		{
 			name: "string concat",
 			init: func() vmi.Compiler {
-				e := vm.NewCompiler()
-				e.EmitString("foo")
-				e.EmitString("bar")
-				e.EmitOps(op.Add)
+				e := vm.NewProgrammer()
+				e.String("foo")
+				e.String("bar")
+				e.Ops(op.Add)
 				return e
 			},
 			expect: "foobar",
@@ -67,10 +67,10 @@ func TestEmitterRunVariants(t *testing.T) {
 		{
 			name: "bool or",
 			init: func() vmi.Compiler {
-				e := vm.NewCompiler()
-				e.EmitBool(true)
-				e.EmitBool(false)
-				e.EmitOps(op.Or)
+				e := vm.NewProgrammer()
+				e.Bool(true)
+				e.Bool(false)
+				e.Ops(op.Or)
 				return e
 			},
 			expect: true,

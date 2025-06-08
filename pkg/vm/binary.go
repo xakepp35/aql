@@ -15,7 +15,7 @@ import (
 //     [pad16] 0..15                   // если нужно, для выравнивания
 //     [data]  []byte                  // всё остальное
 
-func (e *Compiler) MarshalBinary() ([]byte, error) {
+func (e *Programmer) MarshalBinary() ([]byte, error) {
 	nOps := len(e.prog)
 	nArgs := len(e.args)
 
@@ -50,7 +50,7 @@ func (e *Compiler) MarshalBinary() ([]byte, error) {
 	return buf, nil
 }
 
-func (e *Compiler) UnmarshalBinary(data []byte) error {
+func (e *Programmer) UnmarshalBinary(data []byte) error {
 	if len(data) < 32 {
 		return fmt.Errorf("invalid program format")
 	}

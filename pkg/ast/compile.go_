@@ -6,36 +6,36 @@ import (
 	"github.com/xakepp35/aql/internal/vmi"
 )
 
-func (n *Number) Compile(e vmi.Emitter) error {
-	e.EmitOps(op.PushNum)
-	e.EmitArgStr(string(n.Text))
+func (n *Number) Compile(e vmi.ter) error {
+	e.Ops(op.PushNum)
+	e.ArgStr(string(n.Text))
 	return nil
 }
 
-func (s *String) Compile(e vmi.Emitter) error {
-	e.EmitOps(op.PushStr)
-	e.EmitArgStr(string(s.Text))
+func (s *String) Compile(e vmi.ter) error {
+	e.Ops(op.PushStr)
+	e.ArgStr(string(s.Text))
 	return nil
 }
 
-func (b *Bool) Compile(e vmi.Emitter) error {
-	e.EmitOps(op.PushBool)
+func (b *Bool) Compile(e vmi.ter) error {
+	e.Ops(op.PushBool)
 	if b.Val {
-		e.EmitArg(1)
+		e.Arg(1)
 	} else {
-		e.EmitArg(0)
+		e.Arg(0)
 	}
 	return nil
 }
 
-func (n *Null) Compile(e vmi.Emitter) error {
-	e.EmitOps(op.PushNull)
+func (n *Null) Compile(e vmi.ter) error {
+	e.Ops(op.PushNull)
 	return nil
 }
 
-func (i *Ident) Compile(e vmi.Emitter) error {
-	e.EmitOps(op.PushVar)
-	e.EmitArgStr(string(i.Name))
+func (i *Ident) Compile(e vmi.ter) error {
+	e.Ops(op.Var)
+	e.ArgStr(string(i.Name))
 	return nil
 }
 
@@ -48,10 +48,10 @@ func (u *UnaryExpr) Compile(e Emitter) error {
 	switch u.Op {
 	case "-":
 		// реализуем отрицание как "push 0; swap; sub"
-		e.EmitOps(OpPushNum)
-		e.EmitArgStr("0")
-		e.EmitOps(OpSwap) // нужна доп-инстр., либо сделать OpNeg
-		e.EmitOps(OpSub)
+		e.Ops(OpPushNum)
+		e.ArgStr("0")
+		e.Ops(OpSwap) // нужна доп-инстр., либо сделать OpNeg
+		e.Ops(OpSub)
 	default:
 		return fmt.Errorf("unsupported unary op: %s", u.Op)
 	}
@@ -69,15 +69,15 @@ func (b *BinaryExpr) Compile(e Emitter) error {
 	}
 	switch b.Op {
 	case "+":
-		e.EmitOps(OpAdd)
+		e.Ops(OpAdd)
 	case "-":
-		e.EmitOps(OpSub)
+		e.Ops(OpSub)
 	case "*":
-		e.EmitOps(OpMul)
+		e.Ops(OpMul)
 	case "/":
-		e.EmitOps(OpDiv)
+		e.Ops(OpDiv)
 	case "%":
-		e.EmitOps(OpMod)
+		e.Ops(OpMod)
 	default:
 		return fmt.Errorf("unknown binary op %q", b.Op)
 	}
@@ -95,17 +95,17 @@ func (c *CompareExpr) Compile(e Emitter) error {
 	}
 	switch c.Op {
 	case "==":
-		e.EmitOps(OpEq)
+		e.Ops(OpEq)
 	case "!=":
-		e.EmitOps(OpNeq)
+		e.Ops(OpNeq)
 	case "<":
-		e.EmitOps(OpLt)
+		e.Ops(OpLt)
 	case "<=":
-		e.EmitOps(OpLe)
+		e.Ops(OpLe)
 	case ">":
-		e.EmitOps(OpGt)
+		e.Ops(OpGt)
 	case ">=":
-		e.EmitOps(OpGe)
+		e.Ops(OpGe)
 	default:
 		return fmt.Errorf("unknown compare op %q", c.Op)
 	}
@@ -123,9 +123,9 @@ func (l *LogicalExpr) Compile(e Emitter) error {
 	}
 	switch l.Op {
 	case "&&":
-		e.EmitOps(OpAnd)
+		e.Ops(OpAnd)
 	case "||":
-		e.EmitOps(OpOr)
+		e.Ops(OpOr)
 	default:
 		return fmt.Errorf("unknown logical op %q", l.Op)
 	}
@@ -140,9 +140,9 @@ func (c *CallExpr) Compile(e Emitter) error {
 			return err
 		}
 	}
-	e.EmitOps(OpCall)
-	e.EmitArgStr(string(c.Fun))
-	e.EmitArg(uint32(len(c.Args)))
+	e.Ops(OpCall)
+	e.ArgStr(string(c.Fun))
+	e.Arg(uint32(len(c.Args)))
 	return nil
 }
 
@@ -152,8 +152,8 @@ func (f *FieldSel) Compile(e Emitter) error {
 	if err := f.X.Compile(e); err != nil {
 		return err
 	}
-	e.EmitOps(OpField)
-	e.EmitArgStr(string(f.Name))
+	e.Ops(OpField)
+	e.ArgStr(string(f.Name))
 	return nil
 }
 
@@ -165,12 +165,12 @@ func (ix *IndexExpr) Compile(e Emitter) error {
 		return err
 	}
 	if ix.J == nil {
-		e.EmitOps(OpIndex1)
+		e.Ops(OpIndex1)
 	} else {
 		if err := ix.J.Compile(e); err != nil {
 			return err
 		}
-		e.EmitOps(OpIndex2)
+		e.Ops(OpIndex2)
 	}
 	return nil
 }
@@ -184,7 +184,7 @@ func (p *PipeExpr) Compile(e Emitter) error {
 	if err := p.Right.Compile(e); err != nil {
 		return err
 	}
-	e.EmitOps(OpPipe)
+	e.Ops(OpPipe)
 	return nil
 }
 
@@ -199,8 +199,8 @@ func (o *OverExpr) Compile(e Emitter) error {
 			return err
 		}
 	} else {
-		e.EmitOps(OpPushNull) // пустой scope
+		e.Ops(OpPushNull) // пустой scope
 	}
-	e.EmitOps(OpOver)
+	e.Ops(OpOver)
 	return nil
 }

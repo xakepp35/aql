@@ -90,7 +90,7 @@ const aqlEofCode = 1
 const aqlErrCode = 2
 const aqlInitialStackSize = 16
 
-//line aql.y:144
+//line aql.y:134
 
 //line yacctab:1
 var aqlExca = [...]int8{
@@ -101,33 +101,34 @@ var aqlExca = [...]int8{
 
 const aqlPrivate = 57344
 
-const aqlLast = 80
+const aqlLast = 85
 
 var aqlAct = [...]int8{
 	2, 14, 15, 16, 17, 18, 19, 8, 11, 14,
-	15, 16, 17, 18, 19, 57, 11, 9, 7, 71,
-	65, 40, 66, 61, 20, 58, 64, 39, 12, 37,
-	38, 6, 20, 70, 35, 36, 12, 56, 50, 51,
-	60, 4, 22, 44, 45, 46, 47, 48, 49, 5,
-	52, 53, 54, 62, 23, 43, 63, 24, 25, 26,
-	27, 28, 29, 41, 67, 68, 21, 69, 32, 33,
-	34, 55, 42, 30, 31, 13, 10, 3, 1, 59,
+	15, 16, 17, 18, 19, 58, 11, 7, 9, 72,
+	63, 20, 41, 64, 21, 59, 62, 65, 12, 20,
+	38, 39, 21, 40, 71, 66, 12, 67, 57, 51,
+	52, 61, 6, 45, 46, 47, 48, 49, 50, 36,
+	37, 5, 53, 54, 55, 25, 26, 27, 28, 29,
+	30, 4, 23, 24, 22, 68, 69, 44, 70, 33,
+	34, 35, 31, 32, 56, 43, 13, 10, 3, 1,
+	60, 0, 0, 0, 42,
 }
 
 var aqlPact = [...]int16{
-	5, -1000, -1000, 51, 25, 38, 39, 63, 56, -1000,
-	10, 5, 5, -1000, 0, -1000, -1000, -1000, -1000, -1000,
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-	5, 5, 5, 5, 5, 67, 5, -1000, -17, -3,
-	-5, 25, 38, 39, 63, 63, 63, 63, 63, 63,
-	56, 56, -1000, -1000, -1000, -1000, 27, -1, -1000, -8,
-	-1000, -1000, -1000, 5, 5, -1000, 5, 7, -9, -1000,
-	-1000, -1000,
+	5, -1000, -1000, 49, 45, 47, 37, 62, 57, -1000,
+	25, 5, 5, -1000, 6, -1000, -1000, -1000, -1000, -1000,
+	-1000, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+	5, 5, 5, 5, 5, 5, 70, 5, -1000, -17,
+	-3, -2, 45, 47, 37, 62, 62, 62, 62, 62,
+	62, 57, 57, -1000, -1000, -1000, -1000, -6, 0, -1000,
+	7, -1000, -1000, -1000, 5, 5, -1000, 5, 8, -9,
+	-1000, -1000, -1000,
 }
 
 var aqlPgo = [...]int8{
-	0, 79, 78, 0, 77, 41, 49, 31, 18, 7,
-	17, 76, 75,
+	0, 80, 79, 0, 78, 61, 51, 42, 17, 7,
+	18, 77, 76,
 }
 
 var aqlR1 = [...]int8{
@@ -135,7 +136,7 @@ var aqlR1 = [...]int8{
 	7, 7, 7, 7, 7, 7, 8, 8, 8, 9,
 	9, 9, 9, 10, 10, 10, 10, 11, 11, 11,
 	11, 11, 11, 1, 1, 12, 12, 12, 12, 12,
-	12, 12,
+	12, 12, 12,
 }
 
 var aqlR2 = [...]int8{
@@ -143,29 +144,29 @@ var aqlR2 = [...]int8{
 	3, 3, 3, 3, 3, 3, 1, 3, 3, 1,
 	3, 3, 3, 1, 2, 2, 6, 1, 3, 4,
 	6, 3, 4, 1, 3, 1, 1, 1, 1, 1,
-	1, 3,
+	1, 1, 3,
 }
 
 var aqlChk = [...]int16{
 	-1000, -2, -3, -4, -5, -6, -7, -8, -9, -10,
 	-11, 11, 31, -12, 4, 5, 6, 7, 8, 9,
-	27, 15, 17, 16, 18, 19, 20, 21, 22, 23,
-	10, 11, 12, 13, 14, 24, 25, -10, -10, 27,
-	-3, -5, -6, -7, -8, -8, -8, -8, -8, -8,
-	-9, -9, -10, -10, -10, 4, -3, 32, 28, -1,
-	-3, 28, 26, 29, 27, 28, 30, -3, -3, -3,
-	26, 28,
+	24, 27, 15, 17, 16, 18, 19, 20, 21, 22,
+	23, 10, 11, 12, 13, 14, 24, 25, -10, -10,
+	27, -3, -5, -6, -7, -8, -8, -8, -8, -8,
+	-8, -9, -9, -10, -10, -10, 4, -3, 32, 28,
+	-1, -3, 28, 26, 29, 27, 28, 30, -3, -3,
+	-3, 26, 28,
 }
 
 var aqlDef = [...]int8{
 	0, -2, 1, 2, 3, 5, 7, 9, 16, 19,
 	23, 0, 0, 27, 35, 36, 37, 38, 39, 40,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 24, 25, 0,
-	0, 4, 6, 8, 10, 11, 12, 13, 14, 15,
-	17, 18, 20, 21, 22, 28, 0, 0, 31, 0,
-	33, 41, 29, 0, 0, 32, 0, 0, 0, 34,
-	30, 26,
+	41, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 24, 25,
+	0, 0, 4, 6, 8, 10, 11, 12, 13, 14,
+	15, 17, 18, 20, 21, 22, 28, 0, 0, 31,
+	0, 33, 42, 29, 0, 0, 32, 0, 0, 0,
+	34, 30, 26,
 }
 
 var aqlTok1 = [...]int8{
@@ -524,208 +525,201 @@ aqldefault:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
 //line aql.y:48
 		{
-			aqllex.(*Compiler).EmitOps(op.Pipe)
 		}
 	case 6:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:53
+//line aql.y:54
 		{
-			aqllex.(*Compiler).EmitOps(op.Or)
+			aqllex.(*Compiler).Ops(op.Or)
 		}
 	case 8:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:58
+//line aql.y:59
 		{
-			aqllex.(*Compiler).EmitOps(op.And)
+			aqllex.(*Compiler).Ops(op.And)
 		}
 	case 10:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:63
+//line aql.y:64
 		{
-			aqllex.(*Compiler).EmitOps(op.Eq)
+			aqllex.(*Compiler).Ops(op.Eq)
 		}
 	case 11:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:64
+//line aql.y:65
 		{
-			aqllex.(*Compiler).EmitOps(op.Neq)
+			aqllex.(*Compiler).Ops(op.Neq)
 		}
 	case 12:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:65
+//line aql.y:66
 		{
-			aqllex.(*Compiler).EmitOps(op.Lt)
+			aqllex.(*Compiler).Ops(op.Lt)
 		}
 	case 13:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:66
+//line aql.y:67
 		{
-			aqllex.(*Compiler).EmitOps(op.Le)
+			aqllex.(*Compiler).Ops(op.Le)
 		}
 	case 14:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:67
+//line aql.y:68
 		{
-			aqllex.(*Compiler).EmitOps(op.Gt)
+			aqllex.(*Compiler).Ops(op.Gt)
 		}
 	case 15:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:68
+//line aql.y:69
 		{
-			aqllex.(*Compiler).EmitOps(op.Ge)
+			aqllex.(*Compiler).Ops(op.Ge)
 		}
 	case 17:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:73
+//line aql.y:74
 		{
-			aqllex.(*Compiler).EmitOps(op.Add)
+			aqllex.(*Compiler).Ops(op.Add)
 		}
 	case 18:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:74
+//line aql.y:75
 		{
-			aqllex.(*Compiler).EmitOps(op.Sub)
+			aqllex.(*Compiler).Ops(op.Sub)
 		}
 	case 20:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:79
+//line aql.y:80
 		{
-			aqllex.(*Compiler).EmitOps(op.Mul)
+			aqllex.(*Compiler).Ops(op.Mul)
 		}
 	case 21:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:80
+//line aql.y:81
 		{
-			aqllex.(*Compiler).EmitOps(op.Div)
+			aqllex.(*Compiler).Ops(op.Div)
 		}
 	case 22:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:81
+//line aql.y:82
 		{
-			aqllex.(*Compiler).EmitOps(op.Mod)
+			aqllex.(*Compiler).Ops(op.Mod)
 		}
 	case 24:
 		aqlDollar = aqlS[aqlpt-2 : aqlpt+1]
-//line aql.y:87
+//line aql.y:88
 		{
-			aqllex.(*Compiler).EmitOps(op.Not)
+			aqllex.(*Compiler).Ops(op.Not)
 		}
 	case 25:
 		aqlDollar = aqlS[aqlpt-2 : aqlpt+1]
-//line aql.y:88
+//line aql.y:89
 		{
-			aqllex.(*Compiler).EmitNull()
-			aqllex.(*Compiler).EmitOps(op.Over)
+			aqllex.(*Compiler).Null()
+			aqllex.(*Compiler).Ops(op.Over)
 		}
 	case 26:
 		aqlDollar = aqlS[aqlpt-6 : aqlpt+1]
-//line aql.y:89
+//line aql.y:90
 		{
-			aqllex.(*Compiler).EmitOps(op.Over)
+			aqllex.(*Compiler).Ops(op.Over)
 		}
 	case 28:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:95
+//line aql.y:96
 		{
 			c := aqllex.(*Compiler)
-			c.EmitString(string(aqlDollar[3].b))
-			c.EmitOps(op.Field)
+			c.String(string(aqlDollar[3].b))
+			c.Ops(op.Field)
 		}
 	case 29:
 		aqlDollar = aqlS[aqlpt-4 : aqlpt+1]
-//line aql.y:100
+//line aql.y:101
 		{
-			aqllex.(*Compiler).EmitOps(op.Index1)
+			aqllex.(*Compiler).Ops(op.Index1)
 		}
 	case 30:
 		aqlDollar = aqlS[aqlpt-6 : aqlpt+1]
-//line aql.y:101
+//line aql.y:102
 		{
-			aqllex.(*Compiler).EmitOps(op.Index2)
+			aqllex.(*Compiler).Ops(op.Index2)
 		}
 	case 31:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:102
+//line aql.y:103
 		{
 			c := aqllex.(*Compiler)
-			name := string(aqlDollar[1].b)
-			if builtin, ok := Builtins[name]; ok {
-				c.EmitInt(0)
-				c.EmitOps(builtin)
-			} else {
-				c.EmitString(name)
-				c.EmitInt(0)
-				c.EmitOps(op.Call)
-			}
+			c.String(string(aqlDollar[1].b))
+			c.Int(0)
+			c.Ops(op.Call)
 		}
 	case 32:
 		aqlDollar = aqlS[aqlpt-4 : aqlpt+1]
-//line aql.y:114
+//line aql.y:109
 		{
 			c := aqllex.(*Compiler)
-			name := string(aqlDollar[1].b)
-			if builtin, ok := Builtins[name]; ok {
-				c.EmitInt(aqlDollar[3].i) // arg count
-				c.EmitOps(builtin)
-			} else {
-				c.EmitString(name)
-				c.EmitInt(aqlDollar[3].i)
-				c.EmitOps(op.Call)
-			}
+			c.String(string(aqlDollar[1].b))
+			c.Int(aqlDollar[3].i)
+			c.Ops(op.Call)
 		}
 	case 33:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:130
+//line aql.y:119
 		{
 			aqlVAL.i = 1
 		}
 	case 34:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:131
+//line aql.y:120
 		{
 			aqlVAL.i = aqlDollar[1].i + 1
 		}
 	case 35:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:136
+//line aql.y:125
 		{
 			c := aqllex.(*Compiler)
-			c.EmitString(string(aqlDollar[1].b))
-			c.EmitOps(op.PushVar)
+			c.String(string(aqlDollar[1].b))
+			c.Ops(op.Id)
 		}
 	case 36:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:137
+//line aql.y:126
 		{
-			aqllex.(*Compiler).EmitInt(parseInt(aqlDollar[1].b))
+			aqllex.(*Compiler).Int(parseInt(aqlDollar[1].b))
 		}
 	case 37:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:138
+//line aql.y:127
 		{
-			aqllex.(*Compiler).EmitString(string(aqlDollar[1].b))
+			aqllex.(*Compiler).String(string(aqlDollar[1].b))
 		}
 	case 38:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:139
+//line aql.y:128
 		{
-			aqllex.(*Compiler).EmitBool(true)
+			aqllex.(*Compiler).Bool(true)
 		}
 	case 39:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:140
+//line aql.y:129
 		{
-			aqllex.(*Compiler).EmitBool(false)
+			aqllex.(*Compiler).Bool(false)
 		}
 	case 40:
 		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
-//line aql.y:141
+//line aql.y:130
 		{
-			aqllex.(*Compiler).EmitNull()
+			aqllex.(*Compiler).Null()
 		}
 	case 41:
+		aqlDollar = aqlS[aqlpt-1 : aqlpt+1]
+//line aql.y:131
+		{
+			aqllex.(*Compiler).Ops(op.Dup)
+		}
+	case 42:
 		aqlDollar = aqlS[aqlpt-3 : aqlpt+1]
-//line aql.y:142
+//line aql.y:132
 		{ /* только группировка, ничего не эмитим */
 		}
 	}
