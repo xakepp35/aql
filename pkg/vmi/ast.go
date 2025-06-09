@@ -3,6 +3,8 @@ package vmi
 import (
 	"bytes"
 	"strings"
+
+	"github.com/xakepp35/aql/pkg/asf/atf"
 )
 
 // AST defines the interface for Abstract Syntax Tree nodes in AQL.
@@ -25,26 +27,5 @@ type AST interface {
 	Walk(acc any, fn func(AST) error) error  // General-purpose traversal. Calls fn on each node in BFS order.
 	BuildJSON(*bytes.Buffer)                 // Serializes the AST to JSON (great for introspection and tests)
 	BuildString(*strings.Builder)            // Outputs AST in a readable format (Reverse Polish FTW)
-	ASTCompiler
+	ASTExpr
 }
-
-// ASTCompiler recursive BFS 3-phase visitor
-type ASTCompiler interface {
-	Pre(Compiler) error  // Pre-compilation phase (setup, left side of ops, etc.)
-	Body(Compiler) error // Main body compilation (emit the actual instruction logic)
-	Post(Compiler) error // Post-compilation (access chains, deferred ops, etc.)
-}
-
-type ASTKind int32
-
-const (
-	AST_Binary  ASTKind = 0 // a+b
-	AST_Call                // sum(1,2,3)
-	AST_Dup                 // .
-	AST_Field               // .x
-	AST_Literal             // a
-	AST_Pipe                // 1 | string
-	AST_Over                // over .salaries => sum(.)
-	AST_Ternary             // .list[1:2]
-	AST_Unary               // !ok
-)

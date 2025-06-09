@@ -9,47 +9,45 @@ import (
 )
 
 type Ternary struct {
-	Left   vmi.AST
-	Right1 vmi.AST
-	Right2 vmi.AST
-	Op     op.Code
+	Args [3]vmi.AST
+	Op   op.Code
 }
 
-func (e *Ternary) Pre(c vmi.Compiler) error {
-	if err := e.Left.Pre(c); err != nil {
+func (e *Ternary) P0(c vmi.Compiler) error {
+	if err := e.Args[0].P0(c); err != nil {
 		return err
 	}
-	if err := e.Right1.Pre(c); err != nil {
+	if err := e.Args[1].P0(c); err != nil {
 		return err
 	}
-	if err := e.Right2.Pre(c); err != nil {
+	if err := e.Args[2].P0(c); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (e *Ternary) Body(c vmi.Compiler) error {
-	if err := e.Left.Body(c); err != nil {
+func (e *Ternary) P1(c vmi.Compiler) error {
+	if err := e.Args[0].P1(c); err != nil {
 		return err
 	}
-	if err := e.Right1.Body(c); err != nil {
+	if err := e.Args[1].P1(c); err != nil {
 		return err
 	}
-	if err := e.Right2.Body(c); err != nil {
+	if err := e.Args[2].P1(c); err != nil {
 		return err
 	}
 	c.Op(e.Op)
 	return nil
 }
 
-func (e *Ternary) Post(c vmi.Compiler) error {
-	if err := e.Left.Post(c); err != nil {
+func (e *Ternary) P2(c vmi.Compiler) error {
+	if err := e.Args[0].P2(c); err != nil {
 		return err
 	}
-	if err := e.Right1.Post(c); err != nil {
+	if err := e.Args[1].P2(c); err != nil {
 		return err
 	}
-	if err := e.Right2.Post(c); err != nil {
+	if err := e.Args[2].P2(c); err != nil {
 		return err
 	}
 	return nil

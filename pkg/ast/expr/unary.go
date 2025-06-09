@@ -8,25 +8,25 @@ import (
 	"github.com/xakepp35/aql/pkg/vmi"
 )
 
-type Unary struct {
+type Unary[N int] struct {
 	Op    op.Code
-	Right vmi.AST
+	Child [N]vmi.AST
 }
 
-func (e *Unary) Pre(c vmi.Compiler) error {
-	return e.Right.Pre(c)
+func (e *Unary) P0(c vmi.Compiler) error {
+	return e.Right.P0(c)
 }
 
-func (e *Unary) Body(c vmi.Compiler) error {
-	if err := e.Right.Body(c); err != nil {
+func (e *Unary) P1(c vmi.Compiler) error {
+	if err := e.Right.P1(c); err != nil {
 		return err
 	}
-	c.Ops(e.Op)
+	c.Op(e.Op)
 	return nil
 }
 
-func (e *Unary) Post(c vmi.Compiler) error {
-	return e.Right.Post(c)
+func (e *Unary) P2(c vmi.Compiler) error {
+	return e.Right.P2(c)
 }
 
 func (e *Unary) BuildJSON(b *bytes.Buffer) {
