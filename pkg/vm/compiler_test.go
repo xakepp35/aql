@@ -3,7 +3,7 @@ package vm_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/xakepp35/aql/pkg/require"
 	"github.com/xakepp35/aql/pkg/vm"
 	"github.com/xakepp35/aql/pkg/vm/op"
 	"github.com/xakepp35/aql/pkg/vmi"
@@ -25,7 +25,7 @@ func TestProgramInit(t *testing.T) {
 		require.Nil(t, s.Pop())
 		require.Equal(t, false, s.Pop())
 		require.Equal(t, true, s.Pop())
-		require.Equal(t, int64(42), s.Pop())
+		require.Equal(t, int64(42), s.Pop().(int64))
 	})
 
 	t.Run("empty init", func(t *testing.T) {
