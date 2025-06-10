@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/xakepp35/aql/pkg/require"
 	"github.com/xakepp35/aql/pkg/vm"
 	"github.com/xakepp35/aql/pkg/vm/fn"
 	"github.com/xakepp35/aql/pkg/vmi"
@@ -70,7 +70,7 @@ func TestFnDiv_Errors(t *testing.T) {
 		s.PushArgs(int64(6), int64(2))
 		fn.Div(s)
 		require.NoError(t, s.Err())
-		require.Equal(t, int64(3), s.Pop())
+		require.Equal(t, int64(3), s.Pop().(int64))
 	})
 	t.Run("valid float64 division", func(t *testing.T) {
 		s := vm.NewState()
@@ -183,7 +183,7 @@ func TestFnMul(t *testing.T) {
 		s.PushArgs(int64(3), int64(2))
 		fn.Mul(s)
 		require.NoError(t, s.Err())
-		require.Equal(t, int64(6), s.Pop())
+		require.Equal(t, int64(6), s.Pop().(int64))
 	})
 }
 

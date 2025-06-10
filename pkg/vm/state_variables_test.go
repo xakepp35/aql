@@ -3,7 +3,7 @@ package vm_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/xakepp35/aql/pkg/require"
 	"github.com/xakepp35/aql/pkg/vm"
 )
 

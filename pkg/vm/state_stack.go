@@ -21,7 +21,7 @@ func (s *Stack) PushArgs(vals ...any) {
 
 func (s *Stack) Args(n uint) []any {
 	r, l := *s, int(n)
-	if l < len(r) {
+	if l > len(r) {
 		return nil
 	}
 	pos := len(r) - l

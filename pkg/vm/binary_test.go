@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/xakepp35/aql/pkg/require"
 	"github.com/xakepp35/aql/pkg/vm"
 	"github.com/xakepp35/aql/pkg/vm/op"
 )
@@ -35,7 +35,7 @@ func TestProgramMarshalUnmarshal(t *testing.T) {
 		for i := 0; i < s1.Len(); i++ {
 			require.Equal(t, s1.Pop(), s2.Pop())
 		}
-		require.Equal(t, e.Program(), clone.Program())
+		require.BytesEqual(t, e.Program(), clone.Program())
 	})
 }
 
