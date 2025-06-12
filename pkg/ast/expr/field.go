@@ -4,44 +4,49 @@ import (
 	"bytes"
 	"strings"
 
+	"github.com/xakepp35/aql/pkg/asf/atf"
+	"github.com/xakepp35/aql/pkg/ast/asi"
 	"github.com/xakepp35/aql/pkg/vm/op"
-	"github.com/xakepp35/aql/pkg/vmi"
 )
 
 type Field struct {
-	X    vmi.AST
+	Arg  asi.AST
 	Name []byte
 }
 
-func (e *Field) Pre(c vmi.Compiler) error {
-	return e.X.Pre(c)
+func (e Field) Kind() asi.Kind {
+	return asi.Field
 }
 
-func (e *Field) Body(c vmi.Compiler) error {
-	if err := e.X.Body(c); err != nil {
+func (e Field) P0(c asi.Emitter) error {
+	return e.Arg.P0(c)
+}
+
+func (e Field) P1(c asi.Emitter) error {
+	if err := e.Arg.P1(c); err != nil {
 		return err
 	}
 	c.StringBytes(e.Name)
-	c.Op(op.Field)
+	c.RawU8(atf.U8(op.Field))
 	return nil
 }
 
-func (e *Field) Post(c vmi.Compiler) error {
-	return e.X.Post(c)
+func (e Field) P2(c asi.Emitter) error {
+	return e.Arg.P2(c)
 }
 
-func (e *Field) BuildJSON(b *bytes.Buffer) {
-	b.WriteString(`{"expr":"field","x":`)
-	e.X.BuildJSON(b)
+func (e Field) BuildJSON(b *bytes.Buffer) {
+	b.WriteString(`{"expr":"field","arg":`)
+	e.Arg.BuildJSON(b)
 	b.WriteString(`,"name":"`)
 	b.Write(e.Name)
 	b.WriteByte('"')
 	b.WriteByte('}')
 }
 
-func (e *Field) BuildString(b *strings.Builder) {
+func (e Field) BuildString(b *strings.Builder) {
 	b.WriteString("[field ")
-	e.X.BuildString(b)
+	e.Arg.BuildString(b)
 	b.WriteByte(' ')
 	b.Write(e.Name)
 	b.WriteByte(']')

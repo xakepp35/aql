@@ -28,20 +28,19 @@ func _() {
 	_ = x[Complex128-17]
 	_ = x[PC-18]
 	_ = x[SP-19]
-	_ = x[Len-20]
-	_ = x[Time-21]
-	_ = x[Dur-22]
-	_ = x[Bytes-23]
-	_ = x[String-24]
-	_ = x[Error-25]
-	_ = x[IBig-26]
-	_ = x[FBig-27]
-	_ = x[Type_Count-28]
+	_ = x[Time-20]
+	_ = x[Dur-21]
+	_ = x[Bytes-22]
+	_ = x[String-23]
+	_ = x[Error-24]
+	_ = x[IBig-25]
+	_ = x[FBig-26]
+	_ = x[Type_Count-27]
 }
 
-const _Type_name = "NopNilU8U16U32U64U128U256I8I16I32I64I128I256F32F64Complex64Complex128PCSPLenTimeDurBytesStringErrorIBigFBigType_Count"
+const _Type_name = "NopNilU8U16U32U64U128U256I8I16I32I64I128I256F32F64Complex64Complex128PCSPTimeDurBytesStringErrorIBigFBigType_Count"
 
-var _Type_index = [...]uint8{0, 3, 6, 8, 11, 14, 17, 21, 25, 27, 30, 33, 36, 40, 44, 47, 50, 59, 69, 71, 73, 76, 80, 83, 88, 94, 99, 103, 107, 117}
+var _Type_index = [...]uint8{0, 3, 6, 8, 11, 14, 17, 21, 25, 27, 30, 33, 36, 40, 44, 47, 50, 59, 69, 71, 73, 77, 80, 85, 91, 96, 100, 104, 114}
 
 func (i Type) String() string {
 	if i >= Type(len(_Type_index)-1) {

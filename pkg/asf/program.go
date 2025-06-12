@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/big"
 	"time"
+	"unsafe"
 
 	"github.com/xakepp35/aql/pkg/asf/atf"
 )
@@ -67,8 +68,6 @@ func (p *Program) Load(t Type) (any, error) {
 		return p.PC(), nil
 	case SP:
 		return p.SP(), nil
-	case Len:
-		return p.Len(), nil
 	case Time:
 		return p.Time(), nil
 	case Dur:
@@ -112,11 +111,6 @@ func (c *Program) U16() atf.U16 {
 	v := atf.U16(binary.LittleEndian.Uint16(c.hd()))
 	c.Head += 2
 	return v
-}
-
-//go:inline
-func (c *Program) hd() []byte {
-	return c.Emit.Data()[c.Head:]
 }
 
 //go:inline
@@ -172,10 +166,24 @@ func (c *Program) I32() atf.I32 {
 
 //go:inline
 func (c *Program) I64() atf.I64 {
-	v := int64(binary.LittleEndian.Uint64(c.hd()))
+	// v := int64(binary.LittleEndian.Uint64(c.hd()))
+	v := *(*atf.I64)(unsafe.Pointer(&c.Emit[c.Head]))
 	c.Head += 8
 	return v
 }
+
+//go:inline
+func (c *Program) hd() []byte {
+	return c.Emit.Data()[c.Head:]
+}
+
+//go:inline
+func (c *Program) hdp() *byte {
+	return &c.Emit[c.Head]
+}
+
+// c.Emit - slice of byte
+// c.Head - uint32 offset in Emit
 
 //go:inline
 func (c *Program) I128() atf.I128 {
@@ -246,33 +254,26 @@ func (c *Program) SP() atf.SP {
 }
 
 //go:inline
-func (c *Program) Len() int {
-	n := int(binary.LittleEndian.Uint32(c.hd()))
-	c.Head += 4
-	return n
-}
-
-//go:inline
 func (c *Program) Bytes() atf.Bytes {
-	n := c.Len()
-	v := c.Emit[c.Head : c.Head+atf.PC(n)]
-	c.Head += atf.PC(n)
+	n := c.PC()
+	v := c.Emit[c.Head : c.Head+n]
+	c.Head += n
 	return atf.Bytes(v.Data())
 }
 
 //go:inline
 func (c *Program) String() atf.String {
-	n := c.Len()
-	v := string(c.Emit[c.Head : c.Head+atf.PC(n)])
-	c.Head += atf.PC(n)
+	n := c.PC()
+	v := string(c.Emit[c.Head : c.Head+n])
+	c.Head += n
 	return atf.String(v)
 }
 
 //go:inline
 func (c *Program) Error() atf.Error {
-	n := c.Len()
-	v := string(c.Emit[c.Head : c.Head+atf.PC(n)])
-	c.Head += atf.PC(n)
+	n := c.PC()
+	v := string(c.Emit[c.Head : c.Head+n])
+	c.Head += n
 	return errors.New(v)
 }
 
@@ -281,9 +282,9 @@ func (c *Program) IBig() atf.IBig {
 	// first byte: sign
 	sign := c.Emit[c.Head]
 	c.Head++
-	n := c.Len()
-	data := c.Emit[c.Head : c.Head+atf.PC(n)]
-	c.Head += atf.PC(n)
+	n := c.PC()
+	data := c.Emit[c.Head : c.Head+n]
+	c.Head += n
 	var bi big.Int
 	bi.SetBytes(data.Data())
 	if sign == 1 {
@@ -294,9 +295,9 @@ func (c *Program) IBig() atf.IBig {
 
 //go:inline
 func (c *Program) FBig() atf.FBig {
-	n := c.Len()
-	data := c.Emit[c.Head : c.Head+atf.PC(n)]
-	c.Head += atf.PC(n)
+	n := c.PC()
+	data := c.Emit[c.Head : c.Head+n]
+	c.Head += n
 	var bf big.Float
 	bf.GobDecode(data.Data())
 	return bf
@@ -316,10 +317,6 @@ func (c *Program) Dur() atf.Dur {
 	return atf.Dur(time.Duration(ns))
 }
 
-func NewEmitterCap(c int) atf.Emitter {
-	return make(Emitter, 0, c)
-}
-
 func (c *Program) MarshalBinary() []byte {
 	return NewEmitterCap(8 + len(c.Emit)).
 		RawString("ASF1").
@@ -332,7 +329,7 @@ func (c *Program) UnmarshalBinary(src []byte) error {
 	if len(src) < 8 {
 		return ErrInvalid
 	}
-	c.Emit = NewEmitter(src[8:])
+	c.Emit = Emitter(src[8:])
 	c.Head = 4
 	c.Head = atf.PC(c.U64())
 	return nil

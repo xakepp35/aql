@@ -26,7 +26,6 @@ type (
 	Complex128 = complex128
 	PC         uint32 // program counter,
 	SP         uint32 // stack pointer,
-	Len        uint32 // length of something
 	Time       = time.Time
 	Dur        = time.Duration // nanoseconds
 	Bytes      = []byte

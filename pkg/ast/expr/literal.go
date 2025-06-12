@@ -3,43 +3,35 @@ package expr
 import (
 	"bytes"
 	"encoding/hex"
-	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/xakepp35/aql/pkg/vmi"
+	"github.com/xakepp35/aql/pkg/ast/asi"
 )
 
 type Literal struct {
 	X any
 }
 
-func (e *Literal) Pre(c vmi.Compiler) error {
+func (e Literal) Kind() asi.Kind {
+	return asi.Literal
+}
+
+func (e Literal) P0(c asi.Emitter) error {
 	return nil
 }
 
-func (e *Literal) Body(c vmi.Compiler) error {
-	switch v := e.X.(type) {
-	case int64:
-		c.Int(v)
-	case string:
-		c.String(v)
-	case bool:
-		c.Bool(v)
-	case nil:
-		c.Null()
-	default:
-		return fmt.Errorf("unsupported literal type: %T", v)
-	}
+func (e Literal) P1(c asi.Emitter) error {
+	c.Any(e.X)
 	return nil
 }
 
-func (e *Literal) Post(c vmi.Compiler) error {
+func (e Literal) P2(c asi.Emitter) error {
 	return nil
 }
 
-func (e *Literal) BuildJSON(b *bytes.Buffer) {
-	b.WriteString(`{"expr":"literal","value":`)
+func (e Literal) BuildJSON(b *bytes.Buffer) {
+	b.WriteString(`{"expr":"literal","val":`)
 	switch v := e.X.(type) {
 	case string:
 		b.WriteByte('"')
@@ -61,7 +53,7 @@ func (e *Literal) BuildJSON(b *bytes.Buffer) {
 	b.WriteByte('}')
 }
 
-func (e *Literal) BuildString(b *strings.Builder) {
+func (e Literal) BuildString(b *strings.Builder) {
 	switch v := e.X.(type) {
 	case string:
 		b.WriteString(`"`)

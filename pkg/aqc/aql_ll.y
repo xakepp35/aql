@@ -1,5 +1,5 @@
 %{
-package aqc
+package aqc_ll
 
 import "github.com/xakepp35/aql/pkg/vm/op"
 %}

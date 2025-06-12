@@ -4,25 +4,38 @@ import (
 	"bytes"
 	"strings"
 
+	"github.com/xakepp35/aql/pkg/asf/atf"
+	"github.com/xakepp35/aql/pkg/ast/asi"
 	"github.com/xakepp35/aql/pkg/vm/op"
-	"github.com/xakepp35/aql/pkg/vmi"
 )
 
 type Dup struct{}
 
-func (e *Dup) Pre(c vmi.Compiler) error {
+func NewDup() asi.AST {
+	return Dup{}
+}
+
+func (e Dup) Kind() asi.Kind {
+	return asi.Dup
+}
+
+func (e Dup) P0(c asi.Emitter) error {
 	return nil
 }
 
-func (e *Dup) Body(c vmi.Compiler) error {
-	c.Op(op.Dup)
+func (e Dup) P1(c asi.Emitter) error {
+	c.RawU8(atf.U8(op.Dup))
 	return nil
 }
 
-func (e *Dup) BuildJSON(b *bytes.Buffer) {
+func (e Dup) P2(c asi.Emitter) error {
+	return nil
+}
+
+func (e Dup) BuildJSON(b *bytes.Buffer) {
 	b.WriteString(`{"expr":"dup"}`)
 }
 
-func (e *Dup) BuildString(sb *strings.Builder) {
+func (e Dup) BuildString(sb *strings.Builder) {
 	sb.WriteString("[dup]")
 }

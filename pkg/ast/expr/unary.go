@@ -4,42 +4,47 @@ import (
 	"bytes"
 	"strings"
 
+	"github.com/xakepp35/aql/pkg/asf/atf"
+	"github.com/xakepp35/aql/pkg/ast/asi"
 	"github.com/xakepp35/aql/pkg/vm/op"
-	"github.com/xakepp35/aql/pkg/vmi"
 )
 
-type Unary[N int] struct {
-	Op    op.Code
-	Child [N]vmi.AST
+type Unary struct {
+	Arg asi.AST
+	Op  op.Code
 }
 
-func (e *Unary) P0(c vmi.Compiler) error {
-	return e.Right.P0(c)
+func (e Unary) Kind() asi.Kind {
+	return asi.Unary
 }
 
-func (e *Unary) P1(c vmi.Compiler) error {
-	if err := e.Right.P1(c); err != nil {
+func (e Unary) P0(c asi.Emitter) error {
+	return e.Arg.P0(c)
+}
+
+func (e Unary) P1(c asi.Emitter) error {
+	if err := e.Arg.P1(c); err != nil {
 		return err
 	}
-	c.Op(e.Op)
+	c.U8(atf.U8(e.Op))
 	return nil
 }
 
-func (e *Unary) P2(c vmi.Compiler) error {
-	return e.Right.P2(c)
+func (e Unary) P2(c asi.Emitter) error {
+	return e.Arg.P2(c)
 }
 
-func (e *Unary) BuildJSON(b *bytes.Buffer) {
+func (e Unary) BuildJSON(b *bytes.Buffer) {
 	b.WriteString(`{"expr":"unary","op":"`)
 	b.WriteString(e.Op.String())
 	b.WriteString(`","right":`)
-	e.Right.BuildJSON(b)
+	e.Arg.BuildJSON(b)
 	b.WriteByte('}')
 }
 
-func (e *Unary) BuildString(b *strings.Builder) {
+func (e Unary) BuildString(b *strings.Builder) {
 	b.WriteString("[unary ")
-	e.Right.BuildString(b)
+	e.Arg.BuildString(b)
 	b.WriteByte(' ')
 	b.WriteString(e.Op.String())
 	b.WriteByte(']')

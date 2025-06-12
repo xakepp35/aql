@@ -4,39 +4,45 @@ import (
 	"bytes"
 	"strings"
 
+	"github.com/xakepp35/aql/pkg/asf/atf"
+	"github.com/xakepp35/aql/pkg/ast/asi"
 	"github.com/xakepp35/aql/pkg/vm/op"
-	"github.com/xakepp35/aql/pkg/vmi"
 )
 
 type Call struct {
-	Args []vmi.AST
+	Args []asi.AST
 	Name []byte
 }
 
-func (e *Call) Pre(c vmi.Compiler) error {
+func (e *Call) Kind() asi.Kind {
+	return asi.Call
+}
+
+func (e *Call) P0(c asi.Emitter) error {
 	for _, a := range e.Args {
-		if err := a.Pre(c); err != nil {
+		if err := a.P0(c); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (e *Call) Body(c vmi.Compiler) error {
+func (e *Call) P1(c asi.Emitter) error {
 	for _, a := range e.Args {
-		if err := a.Body(c); err != nil {
+		if err := a.P1(c); err != nil {
 			return err
 		}
 	}
-	c.StringBytes(e.Name)
-	c.Int(int64(len(e.Args)))
-	c.Op(op.Call)
+	c.
+		StringBytes(e.Name).
+		RawU8(atf.U8(op.Call)).
+		Commit()
 	return nil
 }
 
-func (e *Call) Post(c vmi.Compiler) error {
+func (e *Call) P2(c asi.Emitter) error {
 	for _, a := range e.Args {
-		if err := a.Post(c); err != nil {
+		if err := a.P2(c); err != nil {
 			return err
 		}
 	}

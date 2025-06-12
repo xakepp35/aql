@@ -25,8 +25,7 @@ var (
 
 // functional errors
 var (
-	ErrDivisionByZero    = errors.New("division by zero")
-	ErrModuloByZero      = errors.New("modulo by zero")
-	ErrFunctionUndefined = errors.New("function undefined")
-	ErrVariableUndefined = errors.New("variable undefined")
+	ErrDivisionByZero      = errors.New("division by zero")
+	ErrModuloByZero        = errors.New("modulo by zero")
+	ErrIdentifierUndefined = errors.New("identifier undefined")
 )

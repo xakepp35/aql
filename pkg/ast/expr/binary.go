@@ -4,62 +4,73 @@ import (
 	"bytes"
 	"strings"
 
+	"github.com/xakepp35/aql/pkg/asf/atf"
+	"github.com/xakepp35/aql/pkg/ast/asi"
 	"github.com/xakepp35/aql/pkg/vm/op"
-	"github.com/xakepp35/aql/pkg/vmi"
 )
 
 type Binary struct {
-	Left  vmi.AST
-	Right vmi.AST
-	Op    op.Code
+	Args [2]asi.AST
+	Op   op.Code
 }
 
-func (e *Binary) Pre(c vmi.Compiler) error {
-	if err := e.Left.Pre(c); err != nil {
+func NewBinary(a, b asi.AST, opCode op.Code) asi.AST {
+	return &Binary{
+		Args: [2]asi.AST{a, b},
+		Op:   opCode,
+	}
+}
+
+func (e *Binary) Kind() asi.Kind {
+	return asi.Binary
+}
+
+func (e *Binary) P0(c asi.Emitter) error {
+	if err := e.Args[0].P0(c); err != nil {
 		return err
 	}
-	if err := e.Right.Pre(c); err != nil {
+	if err := e.Args[1].P0(c); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (e *Binary) Body(c vmi.Builder) error {
-	if err := e.Left.Body(c); err != nil {
+func (e *Binary) P1(c asi.Emitter) error {
+	if err := e.Args[0].P1(c); err != nil {
 		return err
 	}
-	if err := e.Right.Body(c); err != nil {
+	if err := e.Args[1].P1(c); err != nil {
 		return err
 	}
-	c.Op(e.Op)
+	c.RawU8(atf.U8(e.Op))
 	return nil
 }
 
-func (e *Binary) Post(c vmi.Compiler) error {
-	if err := e.Left.Post(c); err != nil {
+func (e *Binary) P2(c asi.Emitter) error {
+	if err := e.Args[0].P2(c); err != nil {
 		return err
 	}
-	if err := e.Right.Post(c); err != nil {
+	if err := e.Args[1].P2(c); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (e *Binary) BuildJSON(b *bytes.Buffer) {
+func (e Binary) BuildJSON(b *bytes.Buffer) {
 	b.WriteString(`{"expr":"binary","op":"`)
 	b.WriteString(e.Op.String())
-	b.WriteString(`","left":`)
-	e.Left.BuildJSON(b)
-	b.WriteString(`,"right":`)
-	e.Right.BuildJSON(b)
-	b.WriteByte('}')
+	b.WriteString(`","args":[`)
+	e.Args[0].BuildJSON(b)
+	b.WriteByte(',')
+	e.Args[1].BuildJSON(b)
+	b.WriteString(`]}`)
 }
 
-func (e *Binary) BuildString(b *strings.Builder) {
+func (e Binary) BuildString(b *strings.Builder) {
 	b.WriteString("[binary ")
-	e.Left.BuildString(b)
+	e.Args[0].BuildString(b)
 	b.WriteByte(' ')
-	e.Right.BuildString(b)
+	e.Args[1].BuildString(b)
 	b.WriteByte(' ')
 	b.WriteString(e.Op.String())
 	b.WriteByte(']')

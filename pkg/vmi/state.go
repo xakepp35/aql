@@ -72,10 +72,10 @@ type Stacker interface {
 
 // StackManipulator api
 type StackManipulator interface {
-	Pushs(...any) Stacker                // push a bunch of args at once
-	Push(v any) Stacker                  // push a single value to the stack
-	Pops(dst *[]any, count uint) Stacker // retrieve the last n args (non-destructively). nil if not enough
-	Pop(dst *any) Stacker                // pop the top value from the stack
+	Pushs(...any) Stacker  // push a bunch of args at once
+	Push(v any) Stacker    // push a single value to the stack
+	Pops(count uint) []any // retrieve the last n args (non-destructively). nil if not enough
+	Pop() any              // pop the top value from the stack
 }
 
 // StackReader api

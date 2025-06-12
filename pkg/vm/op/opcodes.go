@@ -1,9 +1,7 @@
 package op
 
-import "github.com/xakepp35/aql/pkg/asf"
-
 //go:generate stringer -type=Code -trimprefix=
-type Code asf.Type
+type Code byte
 
 const (
 	// flow
@@ -15,11 +13,10 @@ const (
 
 	// stack
 
-	Nil
 	Pop
 	Dup
 	Swap
-	Id
+	Ident
 
 	// logic & math
 

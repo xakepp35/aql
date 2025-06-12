@@ -2,12 +2,13 @@ package vmi
 
 import (
 	"github.com/xakepp35/aql/pkg/asf/atf"
+	"github.com/xakepp35/aql/pkg/ast/asi"
 )
 
 type Programmer interface {
 	Compiler
 	atf.Emitter
-	AST
+	asi.AST
 	BinarySerializer
 }
 

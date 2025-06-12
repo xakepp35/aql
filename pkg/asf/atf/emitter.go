@@ -3,6 +3,10 @@ package atf
 
 // Emitter is a bytes roster for ASF TLV-format
 type Emitter interface {
+	Data() []byte // byte slice fetcher, zero-copy
+	Len() PC      // returns current length of emitted data
+	Commit()      // call at thee end of emission to finalize the data
+
 	Any(any) Emitter               // switch router, for manual use - prefer not to!
 	Nop() Emitter                  // no operation - returns himself
 	Nil() Emitter                  // appends nil interface
@@ -28,6 +32,7 @@ type Emitter interface {
 	Dur(Dur) Emitter               // time.Duration, nanoseconds
 	Bytes(Bytes) Emitter           // []byte, bytes
 	String(String) Emitter         // string
+	StringBytes(Bytes) Emitter     // string
 	Error(Error) Emitter           // error, just like string, but indicates an error on the stack
 	IBig(IBig) Emitter             // big.Int
 	FBig(FBig) Emitter             // big.Float
@@ -35,13 +40,11 @@ type Emitter interface {
 	// raw append functions
 
 	RawLen(l int) Emitter
+	RawU8(v uint8) Emitter
 	RawU16(v uint16) Emitter
 	RawU32(v uint32) Emitter
 	RawU64(v uint64) Emitter
 	Raw(v ...byte) Emitter
 	RawBytes(v []byte) Emitter
 	RawString(v string) Emitter
-
-	// byte slice fetcher, zero-copy
-	Data() []byte
 }

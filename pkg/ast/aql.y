@@ -1,33 +1,36 @@
 %{
 package ast
-import "github.com/xakepp35/aql/pkg/vmi"
+
+import (
+	"github.com/xakepp35/aql/pkg/ast/asi"
+    "github.com/xakepp35/aql/pkg/cvt"
+	"github.com/xakepp35/aql/pkg/vm/op"
+)
 %}
 
+/* ───────────── union ───────────── */
 %union {
-	node  vmi.Node
-	nodes []vmi.Node
-	b     []byte
+	b []byte          /* сырые лексемы-строки от лексера */
+	i int64           /* счётчики (например, кол-во арг-ов) */
+
+	n asi.AST        /* любой узел AST */
+	a []asi.AST      /* срез узлов (список арг-ов) */
 }
 
+/* ───────────── лексемы ───────────── */
 %token <b> IDENT NUMBER STRING
 %token TRUE FALSE NULL
 %token PLUS MINUS STAR SLASH PERCENT
-%token PIPE
-%token ANDAND OROR
+%token PIPE ANDAND OROR
 %token EQ NEQ LT LE GT GE
-%token DOT
-%token LBRACK RBRACK
-%token LPAREN RPAREN
-%token COLON COMMA
-%token OVER
-%token ARROW
+%token DOT LBRACK RBRACK LPAREN RPAREN COLON COMMA
+%token OVER ARROW
 
-%type <node> expr pipe or and cmp add mul unary post atom
-%type <nodes> arg_list
+/* ───────────── sem-types ───────────── */
+%type <n> query expr pipe or and cmp add mul unary post atom
+%type <a> arg_list
 
-%start query
-
-/* ---------- приоритеты ---------- */
+/* ───────────── приоритеты ───────────── */
 %left  PIPE
 %left  OROR
 %left  ANDAND
@@ -35,76 +38,100 @@ import "github.com/xakepp35/aql/pkg/vmi"
 %left  PLUS MINUS
 %left  STAR SLASH PERCENT
 %right UMINUS
+
 %%
 
-query :
-	/* expr EOF      { aqllex.(*bridge).result = $1 } */
-	expr           { aqllex.(*bridge).result = $1 }
+/* ┌───────────── старт ─────────────┐ */
+query:
+	  expr          { aqllex.(*bridge).result = $1 }
 	;
 
-/* pipeline lowest */
-expr   : pipe
+/* ┌───────────── выражения ─────────────┐ */
+expr:
+	  pipe          { $$ = $1 }
+	;
 
-pipe   : or
-       | pipe PIPE or          { $$ = &PipeExpr{Left:$1, Right:$3} }
-       ;
+/* ── оператор | (pipe) ── */
+pipe:
+	  or                   { $$ = $1 }
+	| pipe PIPE or         { $$ = aqllex.(*bridge).Pipe($1, $3) }
+	/* «semantically binary, but emits no op»  → отдельный узел Pipe */
+	;
 
-or     : and
-       | or OROR and           { $$ = &LogicalExpr{Op:"||", Left:$1, Right:$3} }
-       ;
+/* ── || ── */
+or:
+	  and                  { $$ = $1 }
+	| or OROR and          { $$ = aqllex.(*bridge).Binary($1, $3, op.Or) }
+	;
 
-and    : cmp
-       | and ANDAND cmp        { $$ = &LogicalExpr{Op:"&&", Left:$1, Right:$3} }
-       ;
+/* ── && ── */
+and:
+	  cmp                  { $$ = $1 }
+	| and ANDAND cmp       { $$ = aqllex.(*bridge).Binary($1, $3, op.And) }
+	;
 
-cmp    : add
-       | cmp EQ  add           { $$ = &CompareExpr{Op:"==", Left:$1, Right:$3} }
-       | cmp NEQ add           { $$ = &CompareExpr{Op:"!=", Left:$1, Right:$3} }
-       | cmp LT  add           { $$ = &CompareExpr{Op:"<",  Left:$1, Right:$3} }
-       | cmp LE  add           { $$ = &CompareExpr{Op:"<=", Left:$1, Right:$3} }
-       | cmp GT  add           { $$ = &CompareExpr{Op:">",  Left:$1, Right:$3} }
-       | cmp GE  add           { $$ = &CompareExpr{Op:">=", Left:$1, Right:$3} }
-       ;
+/* ── ==, !=, <, … ── */
+cmp:
+	  add                       { $$ = $1 }
+	| cmp EQ  add               { $$ = aqllex.(*bridge).Binary($1,$3, op.Eq) }
+	| cmp NEQ add               { $$ = aqllex.(*bridge).Binary($1,$3, op.Neq) }
+	| cmp LT  add               { $$ = aqllex.(*bridge).Binary($1,$3, op.Lt) }
+	| cmp LE  add               { $$ = aqllex.(*bridge).Binary($1,$3, op.Le) }
+	| cmp GT  add               { $$ = aqllex.(*bridge).Binary($1,$3, op.Gt) }
+	| cmp GE  add               { $$ = aqllex.(*bridge).Binary($1,$3, op.Ge) }
+	;
 
-add    : mul
-       | add PLUS  mul         { $$ = &BinaryExpr{Op:"+", Left:$1, Right:$3} }
-       | add MINUS mul         { $$ = &BinaryExpr{Op:"-", Left:$1, Right:$3} }
-       ;
+/* ── +, – ── */
+add:
+	  mul                       { $$ = $1 }
+	| add PLUS  mul             { $$ = aqllex.(*bridge).Binary($1,$3, op.Add) }
+	| add MINUS mul             { $$ = aqllex.(*bridge).Binary($1,$3, op.Sub) }
+	;
 
-mul    : unary
-       | mul STAR    unary     { $$ = &BinaryExpr{Op:"*", Left:$1, Right:$3} }
-       | mul SLASH   unary     { $$ = &BinaryExpr{Op:"/", Left:$1, Right:$3} }
-       | mul PERCENT unary     { $$ = &BinaryExpr{Op:"%", Left:$1, Right:$3} }
-       ;
+/* ── *, /, % ── */
+mul:
+	  unary                     { $$ = $1 }
+	| mul STAR    unary         { $$ = aqllex.(*bridge).Binary($1,$3, op.Mul) }
+	| mul SLASH   unary         { $$ = aqllex.(*bridge).Binary($1,$3, op.Div) }
+	| mul PERCENT unary         { $$ = aqllex.(*bridge).Binary($1,$3, op.Mod) }
+	;
 
-unary  : post
-       | MINUS unary %prec UMINUS { $$ = &UnaryExpr{Op:"-", X:$2} }
-       | OVER unary               { $$ = &OverExpr{Seq:$2} }
-       | OVER unary ARROW LPAREN expr RPAREN
-                                  { $$ = &OverExpr{Seq:$2, Scope:$5} }
-       ;
+/* ┌───────────── унарный ─────────────┐ */
+unary:
+	  post                                      { $$ = $1 }
+	| MINUS unary %prec UMINUS                 { $$ = aqllex.(*bridge).Unary($2, op.Not) }
+	| OVER unary                               { $$ = aqllex.(*bridge).Over($2, nil) }
+	| OVER unary ARROW LPAREN expr RPAREN      { $$ = aqllex.(*bridge).Over($2, $5) }
+	;
 
-/* постфиксная цепочка */
-post   : atom
-       | post DOT IDENT                { $$ = &FieldSel{X:$1, Name:$3} }
-       | post LBRACK expr RBRACK       { $$ = &IndexExpr{X:$1, I:$3} }
-       | post LBRACK expr COLON expr RBRACK { $$ = &IndexExpr{X:$1, I:$3, J:$5} }
-       | post LPAREN arg_list RPAREN   { id := $1.(*Ident); $$ = &CallExpr{Fun:id.Name, Args:$3} }
-       | post LPAREN RPAREN            { id := $1.(*Ident); $$ = &CallExpr{Fun:id.Name} }
-       ;
+/* ┌───────────── постфикс ─────────────┐ */
+post:
+	  atom                                                         { $$ = $1 }
+	| post DOT IDENT                                               { $$ = aqllex.(*bridge).Field($1, $3) }
+	| post LBRACK expr RBRACK                                      { $$ = aqllex.(*bridge).Binary($1,$3, op.Index1) }
+	| post LBRACK expr COLON expr RBRACK                           { $$ = aqllex.(*bridge).Ternary($1,$3,$5, op.Index2) }
+	| IDENT LPAREN RPAREN                                          { $$ = aqllex.(*bridge).Call(nil, $1) }
+	| IDENT LPAREN arg_list RPAREN                                 { $$ = aqllex.(*bridge).Call($3, $1) }
+	;
 
-arg_list :
-         expr                     { $$ = []vmi.Node{$1} }
-       | arg_list COMMA expr      { $$ = append($1, $3) }
-       ;
+/* ┌───────── список аргументов ─────────┐ */
+arg_list:
+	  expr                           { $$ = []asi.AST{$1} }
+	| arg_list COMMA expr            { $$ = append($1, $3) }
+	;
 
-atom   :
-         IDENT                    { $$ = &Ident{Name:$1} }
-       | NUMBER                   { $$ = &Number{Text:$1} }
-       | STRING                   { $$ = &String{Text:$1} }
-       | TRUE                     { $$ = &Bool{Val:true} }
-       | FALSE                    { $$ = &Bool{Val:false} }
-       | NULL                     { $$ = &Null{} }
-       | LPAREN expr RPAREN       { $$ = $2 }
-       ;
+/* ┌───────────── атомы ─────────────┐ */
+atom:
+	  IDENT   { $$ = aqllex.(*bridge).Ident($1) }
+	| NUMBER  {
+		v, _ := cvt.ParseInt64($1)
+		$$ = aqllex.(*bridge).Literal(v)
+	  }
+	| STRING  { $$ = aqllex.(*bridge).Literal(string($1)) }
+	| TRUE    { $$ = aqllex.(*bridge).Literal(true) }
+	| FALSE   { $$ = aqllex.(*bridge).Literal(false) }
+	| NULL    { $$ = aqllex.(*bridge).Literal(nil) }
+	| DOT     { $$ = aqllex.(*bridge).Dup() }              /* "." - is an alias for top-of-stack */
+	| LPAREN expr RPAREN { $$ = $2 }            /* просто группировка */
+	;
 %%
