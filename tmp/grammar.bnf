@@ -1,0 +1,22 @@
+/* Лексика */
+number       : '0'-'9' {'0'-'9'} ;
+plus         : '+' ;
+mul          : '*' ;
+!whitespace  : ' ' | '\t' | '\n' | '\r' ;
+
+/* Синтаксис */
+<< import "github.com/xakepp35/aql/tmp/ast" >>
+
+Expr :
+    Expr plus Term << ast.NewAdd($0, $2) >>
+  | Term           << $0, nil >>
+  ;
+
+Term :
+    Term mul Factor << ast.NewMul($0, $2) >>
+  | Factor           << $0, nil >>
+  ;
+
+Factor :
+    number << ast.NewNumber($0) >>
+  ;
