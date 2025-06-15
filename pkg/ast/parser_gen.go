@@ -10,7 +10,7 @@ import __yyfmt__ "fmt"
 import (
 	"github.com/xakepp35/aql/pkg/ast/asi"
 	"github.com/xakepp35/aql/pkg/cvt"
-	"github.com/xakepp35/aql/pkg/vm/op"
+	"github.com/xakepp35/aql/pkg/aql/op"
 )
 
 //line aql.y:12

@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"strings"
 
+	"github.com/xakepp35/aql/pkg/aql/op"
 	"github.com/xakepp35/aql/pkg/asf/atf"
 	"github.com/xakepp35/aql/pkg/ast/asi"
-	"github.com/xakepp35/aql/pkg/vm/op"
 )
 
 type Call struct {

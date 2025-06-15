@@ -1,0 +1,19 @@
+package asi
+
+type Factory interface {
+	Nop() AST
+	Dup() AST
+	Swap() AST
+	This() AST
+	Literal() AST
+	Ident() AST
+	Unary(r AST, op op.Code) AST
+	Binary(l, r AST, op op.Code) AST
+	Ternary(a, b, c AST, op op.Code) AST
+	Call(args []AST, name []byte) AST
+	Field(base AST, name []byte) AST
+	Pipe(l, r AST) AST
+	Over() AST
+
+    Release(unused AST)
+}

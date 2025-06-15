@@ -1,0 +1,58 @@
+; ────────── токены (лексер уже выдаёт k) ──────────
+IDENT   ::= [_a-zA-Z] [_a-zA-Z0-9]*        ; имя
+NUMBER  ::= [0-9]+
+STRING  ::= '"' { any-char-except-" } '"'
+TRUE    ::= "true"
+FALSE   ::= "false"
+NULL    ::= "null"
+DOT     ::= "."
+LP      ::= "("
+RP      ::= ")"
+LBR     ::= "["
+RBR     ::= "]"
+COMMA   ::= ","
+COLON   ::= ":"
+ARROW   ::= "=>"
+OVER_KW ::= "over"                         ; в лексере это tOver
+
+; ────────── старт ──────────
+Query   ::= Expr                            
+
+; ────────── приоритетный каскад ──────────
+Expr    ::= Pipe                            
+
+Pipe    ::= Or        { "|"  Or }             ; left-assoc
+Or      ::= And       { "||" And }            ; left-assoc
+And     ::= Cmp       { "&&" Cmp }            ; left-assoc
+
+Cmp     ::= Add       { ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) Add }
+
+Add     ::= Mul       { ( "+" | "-" ) Mul }
+
+Mul     ::= Unary     { ( "*" | "/" | "%" ) Unary }
+
+; ────────── унарные ──────────
+Unary   ::= "-"   Unary                       ; унарный минус / Not
+          | OVER_KW Unary [ ARROW LP Expr RP ] ; over/over=>(...)
+          | Post
+
+; ────────── постфиксы ──────────
+Post    ::= Atom
+          | Post DOT IDENT                    ; поле
+          | Post LBR Expr RBR                 ; index1
+          | Post LBR Expr COLON Expr RBR      ; slice / index2
+          | IDENT LP RP                       ; вызов без арг-ов
+          | IDENT LP ArgList RP               ; вызов с арг-ами
+
+ArgList ::= Expr { COMMA Expr }
+
+; ────────── атомы ──────────
+Atom    ::= IDENT
+          | NUMBER
+          | STRING
+          | TRUE
+          | FALSE
+          | NULL
+          | DOT                               ; dup / this
+          | LP Expr RP                        ; группировка
+

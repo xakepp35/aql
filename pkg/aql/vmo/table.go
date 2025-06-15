@@ -1,13 +1,12 @@
 package vmo
 
 import (
+	"github.com/xakepp35/aql/pkg/aql/op"
 	"github.com/xakepp35/aql/pkg/asf"
-	"github.com/xakepp35/aql/pkg/vm/op"
 )
 
-type Func = func(this *VM)
-
-type Table = [256]Func
+type Fn = func(this *VM)
+type Table = [256]func(this *VM)
 
 var Default Table
 
@@ -16,11 +15,11 @@ func init() {
 }
 
 //go:inline
-func InitTable(ops *[256]Func) {
+func InitTable(ops *[256]Fn) {
 	for i := range *ops {
 		(*ops)[i] = Unimplemented
 	}
-	*ops = [256]Func{
+	*ops = [256]Fn{
 		// loaders
 		asf.Nop:        Nop,
 		asf.Nil:        Nop,

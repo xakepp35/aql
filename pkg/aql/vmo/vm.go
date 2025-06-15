@@ -1,17 +1,18 @@
 package vmo
 
 import (
-	"github.com/xakepp35/aql/pkg/vm/vmc"
+	"github.com/xakepp35/aql/pkg/aql/vmc"
 )
 
 type VM struct {
 	vmc.Executor
 	vmc.Variables
-	vmc.Stream
+	vmc.SendStream
+	vmc.RecvStream
 	vmc.Context
 	*Table
 	Functions
-	UserData any
+	This any
 }
 
 // Run main program entrypoint

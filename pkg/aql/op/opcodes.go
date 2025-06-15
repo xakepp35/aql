@@ -17,6 +17,7 @@ const (
 	Dup
 	Swap
 	Ident
+	This
 
 	// logic & math
 

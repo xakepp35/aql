@@ -1,12 +1,12 @@
-package vm
+package aql
 
 import (
 	"context"
 
+	"github.com/xakepp35/aql/pkg/aql/vmc"
+	"github.com/xakepp35/aql/pkg/aql/vmo"
 	"github.com/xakepp35/aql/pkg/asf"
 	"github.com/xakepp35/aql/pkg/ast"
-	"github.com/xakepp35/aql/pkg/vm/vmc"
-	"github.com/xakepp35/aql/pkg/vm/vmo"
 )
 
 type VM = vmo.VM
@@ -25,10 +25,11 @@ func New() *VM {
 			},
 			Err: nil,
 		},
-		Variables: make(vmc.Variables),
-		Stream:    make(vmc.Stream),
-		Functions: vmo.Builtins,
-		Table:     &vmo.Default,
+		Variables:  make(vmc.Variables),
+		SendStream: make(vmc.SendStream),
+		RecvStream: make(vmc.RecvStream),
+		Functions:  vmo.Builtins,
+		Table:      &vmo.Default,
 		Context: vmc.Context{
 			Context:    context.Background(),
 			CancelFunc: func() {},
@@ -47,10 +48,11 @@ func NewSrc(src []byte) *VM {
 			},
 			Err: nil,
 		},
-		Variables: make(vmc.Variables),
-		Stream:    make(vmc.Stream),
-		Functions: vmo.Builtins,
-		Table:     &vmo.Default,
+		Variables:  make(vmc.Variables),
+		SendStream: make(vmc.SendStream),
+		RecvStream: make(vmc.RecvStream),
+		Functions:  vmo.Builtins,
+		Table:      &vmo.Default,
 		Context: vmc.Context{
 			Context:    context.Background(),
 			CancelFunc: func() {},

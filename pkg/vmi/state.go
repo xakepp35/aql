@@ -5,8 +5,8 @@ package vmi
 import (
 	"context"
 
+	"github.com/xakepp35/aql/pkg/aql/op"
 	"github.com/xakepp35/aql/pkg/asf/atf"
-	"github.com/xakepp35/aql/pkg/vm/op"
 )
 
 // Func defines a VM opcode or builtin function handler.
