@@ -1,8 +1,8 @@
 package vmi
 
 import (
+	"github.com/xakepp35/aql/pkg/aql/op"
 	"github.com/xakepp35/aql/pkg/asf/atf"
-	"github.com/xakepp35/aql/pkg/vm/op"
 )
 
 type Program interface {

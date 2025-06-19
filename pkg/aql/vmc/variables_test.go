@@ -3,8 +3,8 @@ package vmc_test
 import (
 	"testing"
 
+	"github.com/xakepp35/aql/pkg/aql/vmc"
 	"github.com/xakepp35/aql/pkg/require"
-	"github.com/xakepp35/aql/pkg/vm/vmc"
 )
 
 func TestVariablesBasic(t *testing.T) {

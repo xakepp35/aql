@@ -3,9 +3,9 @@ package expr_test
 import (
 	"testing"
 
+	"github.com/xakepp35/aql/pkg/aql/op"
 	"github.com/xakepp35/aql/pkg/asf"
 	"github.com/xakepp35/aql/pkg/ast/expr"
-	"github.com/xakepp35/aql/pkg/vm/op"
 )
 
 func BenchmarkAlloc(b *testing.B) {

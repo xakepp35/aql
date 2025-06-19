@@ -1,15 +1,16 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"strings"
 
+	"github.com/xakepp35/aql/pkg/aql"
 	"github.com/xakepp35/aql/pkg/asf"
 	"github.com/xakepp35/aql/pkg/ast"
 	"github.com/xakepp35/aql/pkg/lexer"
-	"github.com/xakepp35/aql/pkg/vm"
 )
 
 func usage() {
@@ -75,7 +76,7 @@ func main_compile(src string) error {
 	fmt.Println(sb.String())
 
 	// create virtual machine
-	m := vm.New()
+	m := aql.New(context.Background(), nil)
 	// reserve emitter space, for less reallocs during bytecode emission
 	m.Emit = make(asf.Emitter, 0, 256)
 	a.P0(&m.Emit)

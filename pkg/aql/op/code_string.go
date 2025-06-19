@@ -17,32 +17,33 @@ func _() {
 	_ = x[Dup-34]
 	_ = x[Swap-35]
 	_ = x[Ident-36]
-	_ = x[Not-37]
-	_ = x[And-38]
-	_ = x[Or-39]
-	_ = x[Xor-40]
-	_ = x[Shl-41]
-	_ = x[Shr-42]
-	_ = x[Add-43]
-	_ = x[Sub-44]
-	_ = x[Mul-45]
-	_ = x[Div-46]
-	_ = x[Mod-47]
-	_ = x[Eq-48]
-	_ = x[Neq-49]
-	_ = x[Lt-50]
-	_ = x[Le-51]
-	_ = x[Gt-52]
-	_ = x[Ge-53]
-	_ = x[Pipe-54]
-	_ = x[Index1-55]
-	_ = x[Index2-56]
-	_ = x[Field-57]
+	_ = x[This-37]
+	_ = x[Not-38]
+	_ = x[And-39]
+	_ = x[Or-40]
+	_ = x[Xor-41]
+	_ = x[Shl-42]
+	_ = x[Shr-43]
+	_ = x[Add-44]
+	_ = x[Sub-45]
+	_ = x[Mul-46]
+	_ = x[Div-47]
+	_ = x[Mod-48]
+	_ = x[Eq-49]
+	_ = x[Neq-50]
+	_ = x[Lt-51]
+	_ = x[Le-52]
+	_ = x[Gt-53]
+	_ = x[Ge-54]
+	_ = x[Pipe-55]
+	_ = x[Index1-56]
+	_ = x[Index2-57]
+	_ = x[Field-58]
 }
 
-const _Code_name = "HaltCallOverLoopBreakPopDupSwapIdentNotAndOrXorShlShrAddSubMulDivModEqNeqLtLeGtGePipeIndex1Index2Field"
+const _Code_name = "HaltCallOverLoopBreakPopDupSwapIdentThisNotAndOrXorShlShrAddSubMulDivModEqNeqLtLeGtGePipeIndex1Index2Field"
 
-var _Code_index = [...]uint8{0, 4, 8, 12, 16, 21, 24, 27, 31, 36, 39, 42, 44, 47, 50, 53, 56, 59, 62, 65, 68, 70, 73, 75, 77, 79, 81, 85, 91, 97, 102}
+var _Code_index = [...]uint8{0, 4, 8, 12, 16, 21, 24, 27, 31, 36, 40, 43, 46, 48, 51, 54, 57, 60, 63, 66, 69, 72, 74, 77, 79, 81, 83, 85, 89, 95, 101, 106}
 
 func (i Code) String() string {
 	i -= 28

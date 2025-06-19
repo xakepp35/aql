@@ -7,22 +7,22 @@ func NewFunctions() Functions {
 	return make(Functions)
 }
 
-type Functions map[string]Func
+type Functions map[string]Fn
 
-func (f Functions) SetCalls(calls map[string]Func) {
+func (f Functions) SetCalls(calls map[string]Fn) {
 	for name, call := range calls {
 		f[name] = call
 	}
 }
 
-func (f Functions) SetCall(name string, call Func) {
+func (f Functions) SetCall(name string, call Fn) {
 	f[name] = call
 }
 
-func (f Functions) GetCall(name string) Func {
+func (f Functions) GetCall(name string) Fn {
 	return f[name]
 }
 
-func (f Functions) GetCalls() map[string]Func {
+func (f Functions) GetCalls() map[string]Fn {
 	return f
 }

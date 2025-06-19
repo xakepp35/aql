@@ -17,6 +17,11 @@ const (
 	// This enables things like piping into the same value multiple times.
 	Dup
 
+	// Swap: Swaps 2 top elements of the stack.
+	// Example: `$` (dopllar) is syntactic sugar for swapper.
+	// This enables things like piping into the same value multiple times.
+	Swap
+
 	// This: keyword that refers to the current context object in chained access or inside OVER/PIPE.
 	// Not the same as "self" in OOP, but rather a contextual anchor.
 	This

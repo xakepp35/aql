@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	"github.com/xakepp35/aql/pkg/ast/asi"
+	"github.com/xakepp35/aql/pkg/ast/expr"
 	"github.com/xakepp35/aql/pkg/lexer"
 )
 
-var Arn = NewArena()
+var Arn = expr.NewArena(8)
 
 func Lex(src []byte) error {
 	lx := lexer.New(src)
@@ -36,7 +37,7 @@ func Parse(src []byte) (asi.AST, error) {
 
 type bridge struct {
 	lx *lexer.Lexer
-	*Arena
+	*expr.Arena
 	result asi.AST
 	errs   []string
 }
