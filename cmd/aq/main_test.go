@@ -10,11 +10,18 @@ import (
 	"github.com/xakepp35/aql/pkg/ast/expr"
 	"github.com/xakepp35/aql/pkg/ast/fparse2"
 	"github.com/xakepp35/aql/pkg/ast/fparse3"
+	"github.com/xakepp35/aql/pkg/require"
 )
 
 const demoExprStr = "1+2*3"
 
 var demoExpr = []byte(demoExprStr)
+
+func TestFull(t *testing.T) {
+	m := aql.Run(demoExprStr)
+	require.Equal(t, m.Pop().(int64), int64(7))
+	// require.NoError(t, err)
+}
 
 func BenchmarkFull(b *testing.B) {
 	b.ReportAllocs()
