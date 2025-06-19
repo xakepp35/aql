@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/xakepp35/aql/pkg/aql"
@@ -72,15 +73,12 @@ func BenchmarkMath(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		m.Run()
-		// if x := m.Pop(); x != int64(7) {
-		// 	b.Fatalf("expected 7, got %v", x)
-		// }
 	}
 }
 
 func BenchmarkNop(b *testing.B) {
-	m := aql.New()
-	m.Emit = make(asf.Emitter, 256)
+	m := aql.New(context.Background(), nil)
+	m.Executor.WithEmit(make(asf.Emitter, 256))
 	b.ReportAllocs()
 	b.SetBytes(256)
 	b.ResetTimer()

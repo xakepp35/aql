@@ -15,49 +15,22 @@ func Run(src string) *VM {
 	return NewSrc([]byte(src)).Run()
 }
 
-func New() *VM {
+func New(ctx context.Context, cancel context.CancelFunc) *VM {
 	return &VM{
-		Executor: vmc.Executor{
-			Stack: make(vmc.Stack, 0, 16),
-			Program: asf.Program{
-				Emit: asf.Emitter{},
-				Head: 0,
-			},
-			Err: nil,
-		},
+		Executor:   vmc.New(ctx, cancel),
 		Variables:  make(vmc.Variables),
 		SendStream: make(vmc.SendStream),
 		RecvStream: make(vmc.RecvStream),
 		Functions:  vmo.Builtins,
 		Table:      &vmo.Default,
-		Context: vmc.Context{
-			Context:    context.Background(),
-			CancelFunc: func() {},
-		},
 	}
 }
 
 //go:inline
 func NewSrc(src []byte) *VM {
-	return &VM{
-		Executor: vmc.Executor{
-			Stack: make(vmc.Stack, 0, 16),
-			Program: asf.Program{
-				Emit: MustCompile(src),
-				Head: 0,
-			},
-			Err: nil,
-		},
-		Variables:  make(vmc.Variables),
-		SendStream: make(vmc.SendStream),
-		RecvStream: make(vmc.RecvStream),
-		Functions:  vmo.Builtins,
-		Table:      &vmo.Default,
-		Context: vmc.Context{
-			Context:    context.Background(),
-			CancelFunc: func() {},
-		},
-	}
+	res := New(context.Background(), nil)
+	res.Emit = MustCompile(src)
+	return res
 }
 
 func MustCompile(src []byte) asf.Emitter {

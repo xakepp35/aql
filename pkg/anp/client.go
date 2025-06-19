@@ -41,7 +41,7 @@ func Dial(ctx context.Context, network, addr string) (*Client, error) {
 }
 
 func (s *Client) Init(ctx context.Context, conn net.Conn) {
-	s.netvm.SetCtx(context.WithCancel(ctx))
+	s.netvm.WithCtx(context.WithCancel(ctx))
 	s.conn = conn
 }
 

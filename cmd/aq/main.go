@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -75,7 +76,7 @@ func main_compile(src string) error {
 	fmt.Println(sb.String())
 
 	// create virtual machine
-	m := aql.New()
+	m := aql.New(context.Background(), nil)
 	// reserve emitter space, for less reallocs during bytecode emission
 	m.Emit = make(asf.Emitter, 0, 256)
 	a.P0(&m.Emit)
