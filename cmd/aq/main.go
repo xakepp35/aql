@@ -1,14 +1,16 @@
 package main
 
 import (
-	"encoding/hex"
+	"context"
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
-	"github.com/xakepp35/aql/pkg/aqc"
+	"github.com/xakepp35/aql/pkg/aql"
+	"github.com/xakepp35/aql/pkg/asf"
+	"github.com/xakepp35/aql/pkg/ast"
 	"github.com/xakepp35/aql/pkg/lexer"
-	"github.com/xakepp35/aql/pkg/vm"
 )
 
 func usage() {
@@ -16,14 +18,16 @@ func usage() {
 }
 
 func main() {
-	if len(os.Args) < 3 {
+	if len(os.Args) < 2 {
 		usage()
 		os.Exit(1)
 	}
-
-	cmd := os.Args[1]
-	program := os.Args[2]
-
+	program := os.Args[1]
+	cmd := "run"
+	if len(os.Args) > 2 {
+		cmd = os.Args[1]
+		program = os.Args[2]
+	}
 	switch cmd {
 	case "run":
 		err := main_run(program)
@@ -49,26 +53,45 @@ func main() {
 	}
 }
 
-func main_run(src string) error {
-	res, err := vm.Run([]byte(src), nil)
-	if err != nil {
-		return err
-	}
-	fmt.Fprintln(os.Stdout, res)
-	return nil
-}
+var main_run = main_compile
+
+// func main_run(src string) error {
+// 	res, err := vm.Run([]byte(src), nil)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	fmt.Fprintln(os.Stdout, res)
+// 	return nil
+// }
 
 func main_compile(src string) error {
-	e := vm.NewCompiler()
-	if err := aqc.Compile([]byte(src), e); err != nil {
+	// parse source code into ast tree
+	a, err := ast.Parse([]byte(src))
+	if err != nil {
 		return fmt.Errorf("compile: %w", err)
 	}
-	bin, err := e.MarshalBinary()
-	if err != nil {
-		return err
-	}
-	// выводим как hex‑строку чтобы не бить терминал бинарщиной
-	fmt.Fprintln(os.Stdout, hex.EncodeToString(bin))
+	// print tree in terminal
+	var sb strings.Builder
+	a.BuildString(&sb)
+	fmt.Println(sb.String())
+
+	// create virtual machine
+	m := aql.New(context.Background(), nil)
+	// reserve emitter space, for less reallocs during bytecode emission
+	m.Emit = make(asf.Emitter, 0, 256)
+	a.P0(&m.Emit)
+	a.P1(&m.Emit)
+	a.P2(&m.Emit)
+
+	// print vm bytecode as hex
+	fmt.Println(m.Emit.AsHex())
+
+	// run vm
+	m.Run()
+
+	// print stack dump after run
+	fmt.Println(m.Dump())
+
 	return nil
 }
 
@@ -93,74 +116,3 @@ func fatal(err error) {
 	}
 	os.Exit(2)
 }
-
-// func main() {
-// 	if len(os.Args) != 2 {
-// 		fmt.Println("Usage: aqparse 'expression'")
-// 		os.Exit(1)
-// 	}
-// 	expr := os.Args[1]
-// 	lx := lexer.New([]byte(expr))
-// 	for {
-// 		tok := lx.Next()
-// 		fmt.Printf("%v\t%q\n", tok.Kind, tok.Lit)
-// 		if tok.Kind == lexer.TEOF {
-// 			break
-// 		}
-// 	}
-// 	fmt.Fprintf(os.Stdout, "LEXED")
-// 	prog := vm.NewProgram()
-// 	err := aqc.Compile([]byte(expr), prog)
-// 	if err != nil {
-// 		fmt.Fprintf(os.Stderr, "compile error: %v\n", err)
-// 		os.Exit(2)
-// 	}
-
-// 	fmt.Printf("OK: %#v\n", prog)
-
-// 	this := vm.NewState()
-// 	prog.Init(this)
-// 	err = prog.Run(this)
-// 	if err != nil {
-// 		fmt.Fprintf(os.Stderr, "parse error: %v\n", err)
-// 		os.Exit(2)
-// 	}
-// 	res := this.Pop()
-
-// 	fmt.Printf("Eval: %v\n", res)
-// }
-
-// func main() {
-// 	if len(os.Args) != 2 {
-// 		fmt.Println("Usage: aqparse 'expression'")
-// 		os.Exit(1)
-// 	}
-// 	expr := os.Args[1]
-// 	lx := lexer.New([]byte(expr))
-// 	for {
-// 		tok := lx.Next()
-// 		fmt.Printf("%v\t%q\n", tok.Kind, tok.Lit)
-// 		if tok.Kind == lexer.TEOF {
-// 			break
-// 		}
-// 	}
-// 	fmt.Fprintf(os.Stdout, "LEXED")
-// 	node, err := ast.Parse([]byte(expr))
-// 	if err != nil {
-// 		fmt.Fprintf(os.Stderr, "parse error: %v\n", err)
-// 		os.Exit(2)
-// 	}
-
-// 	fmt.Printf("OK: %#v\n", node)
-
-// 	this := vm.NewState()
-// 	this.Set("x", 42.7)
-// 	err = node.Eval(this)
-// 	if err != nil {
-// 		fmt.Fprintf(os.Stderr, "parse error: %v\n", err)
-// 		os.Exit(2)
-// 	}
-// 	res := this.Pop()
-
-// 	fmt.Printf("Eval: %v\n", res)
-// }

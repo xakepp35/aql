@@ -1,3 +1,3 @@
 module github.com/xakepp35/aql
 
-go 1.24
+go 1.21

@@ -4,24 +4,41 @@ package ast
 import (
 	"fmt"
 
+	"github.com/xakepp35/aql/pkg/ast/asi"
+	"github.com/xakepp35/aql/pkg/ast/expr"
 	"github.com/xakepp35/aql/pkg/lexer"
-	"github.com/xakepp35/aql/pkg/vmi"
 )
 
+var Arn = expr.NewArena(8)
+
+func Lex(src []byte) error {
+	lx := lexer.New(src)
+	var t lexer.Token
+	for t.Kind != lexer.TEOF {
+		t = lx.Next()
+	}
+	return nil
+}
+
 // Parse разбирает выражение и возвращает AST.
-func Parse(src []byte) (vmi.Node, error) {
+func Parse(src []byte) (asi.AST, error) {
 	// aqlDebug = 4
 	// aqlErrorVerbose = true
-	b := &bridge{lx: lexer.New(src)}
-	if aqlParse(b) != 0 || len(b.errs) > 0 {
+	Arn.Reset()
+	b := bridge{lx: lexer.New(src), Arena: Arn}
+
+	p := aqlNewParser()
+
+	if p.Parse(&b) != 0 || len(b.errs) > 0 {
 		return nil, fmt.Errorf("%v", b.errs)
 	}
 	return b.result, nil
 }
 
 type bridge struct {
-	lx     *lexer.Lexer
-	result vmi.Node
+	lx *lexer.Lexer
+	*expr.Arena
+	result asi.AST
 	errs   []string
 }
 
